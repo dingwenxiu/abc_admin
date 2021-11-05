@@ -1,0 +1,149 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>活动管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>活动列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button nzType="primary" nzSize="small" (click)="activityAdd()">添加活动</button>
+    <section class="header">
+      <i class="fa fa-table"></i>
+      活动列表
+    </section>
+    <section class="main-content">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">活动ID</th>
+            <th nzWidth="15%">标题</th>
+            <th nzWidth="7%">标识</th>
+            <th nzWidth="7%">首页图</th>
+            <th nzWidth="7%">列表图</th>
+            <th nzWidth="15%">开始时间</th>
+            <th nzWidth="15%">结束时间</th>
+            <th nzWidth="5%">状态</th>
+            <th nzWidth="12%">添加人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.title}}</td>
+            <td>{{item.sign}}</td>
+            <td><img [src]="item.image_home" alt="home" style="width: 60px; height: 60px"></td>
+            <td><img [src]="item.image_list" alt="list" style="width: 60px; height: 60px"></td>
+            <td>{{item.start_time}}</td>
+            <td>{{item.end_time}}</td>
+            <td>
+              <ng-container *ngIf="item.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>{{item.admin_name}}</td>
+            <td>
+                <a href="javascript:;" class="a-link" (click)="activityAdd(item.id)">编辑</a>
+                <a href="javascript:;" class="a-link" (click)="doStatus(item)">
+                    <ng-container *ngIf="item.status; else elseTemplate2">
+                        禁用
+                      </ng-container>
+                      <ng-template #elseTemplate2>
+                        启用
+                      </ng-template>
+                </a>
+                <a href="javascript:;" class="a-link" (click)="activityDel(item)">删除</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 添加活动 -->
+  <nz-drawer
+      [nzClosable]="edit.show"
+      [nzVisible]="edit.show"
+      [nzMaskClosable]= 'false'
+      nzWidth = '800px'
+      nzPlacement="right"
+      nzTitle="添加活动"
+      (nzOnClose)="edit.show = false"
+    >
+    <section class="drawer-box">
+        <section class="tpl-list flexa">
+            <span class="tpl-title">活动标题:</span>
+            <input  nz-input  type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="edit.data.title"/>
+          </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">活动类型:</span>
+              <nz-select style="width: 173px;" [(ngModel)]="edit.data.type" nzAllowClear>
+                <nz-option *ngFor="let option of edit.config.activity_type" [nzValue]="option.key" [nzLabel]="option.value">
+                </nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">活动标识:</span>
+             <input nz-input type="text"  placeholder="请输入" class="tpl-input" [(ngModel)]="edit.data.sign"/>
+            </section>
+            <section class="tpl-list flexa" *ngIf="!edit.data.image_home">
+                <span class="tpl-title">首页图片:</span>
+                <nz-upload
+                [nzAction]="api.domian + 'roomUploadAvatar'"
+                (nzChange) = 'homeImages($event)'
+                >
+                  <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                </nz-upload>
+              </section>
+              <section class="tpl-list flexa"  *ngIf="edit.data.image_home">
+                <span class="tpl-title">首页图片:</span>
+                <section class="img-box">
+                  <img style="max-height: 100px;max-width: 100px;" [src]='etidImage_home'>
+                  <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteHomeLists()"></i>
+                </section>
+            </section>
+          
+            <section class="tpl-list flexa" *ngIf="!edit.data.image_list">
+                <span class="tpl-title">列表图片:</span>
+                <nz-upload
+                [nzAction]="api.domian + 'roomUploadAvatar'"
+                (nzChange) = 'listImages($event)'
+                >
+                  <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                </nz-upload>
+              </section>
+            <section class="tpl-list flexa"  *ngIf="edit.data.image_list">
+                <span class="tpl-title">列表图片:</span>
+                <section class="img-box">
+                  <img style="max-height: 100px;max-width: 100px;" [src]='etidImage_lists'>
+                  <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImageLists()"></i>
+                </section>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" nzShowTime></nz-range-picker>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">排序:</span>
+              <input  nz-input  type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="edit.data.sort"/>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">状态:</span>
+              <nz-switch [(ngModel)]="edit.data.status" nzCheckedChildren="开" nzUnCheckedChildren="关"></nz-switch>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">描述:</span>
+              <textarea rows="4" nz-input class="tpl-input"  placeholder="请输入" [(ngModel)]="edit.data.description"></textarea>
+            </section>
+        <button nz-button style="margin-left:180px;" nzType="primary" (click)="submitAddActivity()"  class="submit">
+          提交
+        </button>
+    </section>
+    </nz-drawer>
+</nz-content>

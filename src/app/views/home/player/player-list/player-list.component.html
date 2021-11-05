@@ -1,0 +1,232 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>玩家管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>玩家列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="header">
+        <i class="fa fa-table"></i>
+        玩家列表
+      </section>
+      <section class="mian-search">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">游戏系列:</span>
+          <nz-select class="tpl-input" [(ngModel)]="searchData.partner_sign" nzAllowClear nzSize="small"
+            nzPlaceHolder="商户">
+            <nz-option nzValue="all" nzLabel="全部平台"></nz-option>
+            <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">用户ID:</span>
+          <input nz-input placeholder="用户ID" [(ngModel)]="searchData['id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">用户名:</span>
+          <input nz-input placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">上级ID:</span>
+          <input nz-input placeholder="上级ID" [(ngModel)]="searchData['parent_id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">总代ID:</span>
+          <input nz-input placeholder="总代ID" [(ngModel)]="searchData['top_id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">代理类型:</span>
+          <nz-select [(ngModel)]="searchData['type']" nzAllowClear nzPlaceHolder="代理类型" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="all" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of userTypeOptions | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">冻结类型:</span>
+          <nz-select [(ngModel)]="searchData['frozen_type']" nzAllowClear nzPlaceHolder="冻结类型" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="all" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of frozenTypeOptions | keyvalue" nzValue="{{item.key}}"
+              nzLabel="{{item.value}}"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">测试玩家:</span>
+          <nz-select [(ngModel)]="searchData['is_tester']" nzAllowClear nzPlaceHolder="是否测试玩家" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="是"></nz-option>
+            <nz-option nzValue="0" nzLabel="否"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">余额区间:</span>
+          <nz-input-group nzCompact class="tpl-input" nzSize="small">
+            <input type="text" nz-input [(ngModel)]="searchData['min']" style="width:92px;" placeHolder="余额最小"
+              nzSize="small" (ngModelChange)="checkMinInt($event)" />-
+            <input type="text" nz-input [(ngModel)]="searchData['max']" style="width:92px;" placeHolder="余额最大"
+              nzSize="small" />
+          </nz-input-group>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title tpl-title-search">注册时间:</span>
+          <nz-range-picker [(ngModel)]="dateRange" nzSize="small" (ngModelChange)="onChange($event)"
+            (click)="timeHandle()" nzShowTime> </nz-range-picker>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-search" (click)="doSearch()" nzSize="small"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <section class="select-lottery" *ngIf="parentSet && parentSet.length > 0">
+        <a href="javascript:;" class="a-link" (click)="findChild(0)">根目录</a>
+        <ng-container *ngFor="let item of parentSet">
+          >> <a href="javascript:;" class="a-link" (click)="findChild(item, true)">{{item.username}}</a>
+        </ng-container>
+      </section>
+      <nz-table nzShowQuickJumper [nzPageSize]="searchData.page_size" [nzShowPagination]="false" #tableData
+        [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <!-- <th nzShowExpand>操作</th> -->
+            <th>商户</th>
+            <th>用户ID</th>
+            <th>上级ID</th>
+            <th>用户名</th>
+            <th>用户层级</th>
+            <th>账户余额</th>
+            <th>冻结金额</th>
+            <th>身份</th>
+            <th>奖金组</th>
+            <th>代理分红</th>
+            <th>代理日工资</th>
+            <th>直属下级数量</th>
+            <th>下级数量</th>
+            <th>冻结类型</th>
+            <th>测试</th>
+            <th>最后登录时间</th>
+            <th>创建时间</th>
+            <th>备注</th>
+            <th>状态</th>
+            <th>详情</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data let-i="index" [ngForOf]="tableData.data">
+            <tr>
+              <!-- <td nzShowExpand [(nzExpand)]="mapOfExpandData[data.username]"></td> -->
+              <td>{{data.partner_sign}}</td>
+              <td>{{data.id}}</td>
+              <td>{{data.parent_id}}</td>
+              <td>
+                <a href="javascript:;" class="a-link" (click)="findChild(data)">{{data.username}}</a>
+              </td>
+              <td>{{data.user_level}}</td>
+              <td>{{data.balance}}</td>
+              <td>{{data.frozen_balance}}</td>
+              <td>{{data.type_desc}}</td>
+              <td>{{data.prize_group}}</td>
+              <td>{{data.bonus_percentage}}</td>
+              <td>{{data.salary_percentage}}</td>
+              <td>{{data.direct_child_count}}</td>
+              <td>{{data.child_count}}</td>
+              <td>{{data.frozen_type}}</td>
+              <td>
+                <span style="color: green;" *ngIf="data.is_tester == 1">是</span>
+                <span style="color: green;" *ngIf="data.is_tester == 0">否</span>
+              </td>
+              <td>{{data.last_login_time}}</td>
+              <td>{{data.register_time}}</td>
+              <td>
+                <p class="text-content">
+                  {{data.mark}}
+                </p>
+              </td>
+              <td>
+                <span *ngIf="data.status == 1" style="color: green;">启用</span>
+                <span *ngIf="data.status != 1" style="color: red;">禁用</span>
+              </td>
+              <td>
+                <a href="javascript:;" class="a-link" (click)="doDetail(data)">详情</a>
+              </td>
+            </tr>
+            <!-- <tr [nzExpand]="mapOfExpandData[data.username]">
+            <td colspan="17" class="expand">
+              <nz-switch [ngModel]="data.status" (ngModelChange)="doStatus(data.id, i)" nzCheckedChildren="玩家状态" nzUnCheckedChildren="玩家状态"></nz-switch>
+            </td>
+          </tr> -->
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='searchData.page_size' [nzTotal]="page.total"
+        [(nzPageIndex)]="searchData.page_index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+        class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="detail.show" nzTitle="用户详情" (nzOnClose)="back()">
+    <ul class="fasts">
+      <li class='fast'><span class="a-link" style="font-size: larger"> {{detail.player.username}} </span>于<span
+          class="a-link"> {{detail.player.register_time}} </span> 通过 <span class="a-link">
+          {{detail.player.register_device}} </span> 加入会员, 注册IP<span
+          class="a-link">{{detail.player.register_ip}}({{detail.player.register_city}})</span></li>
+      <li class='fast'>所属代理商:
+        <span *ngFor="let item of detail.parentSet" class="a-link">{{item.name}}</span> &nbsp;&nbsp;&nbsp;
+      </li>
+      <li class='fast'>账户余额: <span class="a-link">{{detail.account.balance}}</span>, 冻结余额: <span
+          class="a-link">{{detail.account.frozen_balance}}</span>
+        <!-- <a>人工存入</a><a>人工取出</a><a>查看账户</a> -->
+      </li>
+      <li class='fast'>目前状态: <span class="a-link">{{detail.player.frozen_type}}</span></li>
+      <li class='fast'>VIP等级: <span class="a-link">{{detail.player.vip_level}}</span></li>
+      <li class='fast'>存款次数: <span class="a-link">{{detail.player.totalRechargeCount}}</span> 次, 共 <span
+          class="a-link">{{detail.player.totalRechargeAmount}}</span> 元,
+        提款次数: <span class="a-link">{{detail.player.totalWithdrawCount}}</span> 次,共 <span
+          class="a-link">{{detail.player.totalWithdrawAmount}}</span> 元:</li>
+      <li class='fast'>手机号: <span class="a-link">{{detail.player.mobile}}</span></li>
+      <li class='fast'>最后一次登入IP为: <span class="a-link">{{detail.player.last_login_ip}}</span>, 于 <span
+          class="a-link">{{detail.player.last_login_time}}</span></li>
+      <li class='fast' *ngIf="detail.cards">银行卡：
+        <p *ngFor="let item of detail.cards; let i = index">
+          <span style="color: red; padding-left: 9px;">({{i+1}}:)</span> 持卡人:<span
+            class="a-link">{{item.owner_name}}</span>,卡号:<span class="a-link">{{item.card_number}}</span>, 银行:<span
+            class="a-link">{{item.bank_name}}</span>, 时间:<span class="a-link">{{item.created_time}}</span>
+        </p>
+      </li>
+      <li class='fast'>
+        充值订单(近10单):
+        <p *ngFor="let item of detail.last10RechargeOrder; let i = index">
+          <span style="color: red;padding-left: 9px;">({{i+1}}:)</span> 金额:<span
+            class="a-link">{{item.amount}}</span>,实际到帐:<span class="a-link">{{item.real_amount}}</span>, 时间:<span
+            class="a-link">{{item.add_time}}</span>, 状态:<span class="a-link">{{item.status}}</span>
+        </p>
+      </li>
+      <li class='fast'>
+        提现订单(近10单):
+        <p *ngFor="let item of detail.last10WithdrawOrder; let i = index">
+          <span style="color: red;padding-left: 9px;">({{i+1}}):</span> 金额:<span
+            class="a-link">{{item.amount}}</span>,实际到帐:<span class="a-link">{{item.real_amount}}</span>, 时间:<span
+            class="a-link">{{item.request_time}}</span>, 状态:<span class="a-link">{{item.status}}</span>
+        </p>
+      </li>
+      <li class='fast'>
+        代理日工资: <span style="color: red;padding-left: 9px;">{{detail.player.salary_percentage}}%</span>
+      </li>
+      <li class='fast'>
+        代理分红: <span style="color: red;padding-left: 9px;">{{detail.player.bonus_percentage}}%</span>
+      </li>
+    </ul>
+  </nz-drawer>
+</nz-content>

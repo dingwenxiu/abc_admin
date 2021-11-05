@@ -1,0 +1,130 @@
+<nz-content style="margin:0 16px;">
+	<nz-breadcrumb style="margin:16px 0;">
+		<nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+		<nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+		<nz-breadcrumb-item>历史数据</nz-breadcrumb-item>
+		<nz-breadcrumb-item>商户历史访问记录</nz-breadcrumb-item>
+	</nz-breadcrumb>
+	<section style="padding:12px; background: #fff; min-height: 360px;">
+		<section class="header">
+			<i class="fa fa-table"></i>
+			商户历史访问记录
+		</section>
+		<section class="main-content">
+			<section class="mian-search">
+				<div>
+					<section class="tpl-list flexa">
+						<span>商户:</span>&nbsp;&nbsp;
+						<nz-select style="width: 150px;" nzSize="small" [(ngModel)]="searchData.partner_sign"
+							nzAllowClear nzPlaceHolder="商户" class="tpl-input">
+							<nz-option *ngFor="let item of dateRangeList|keyvalue" [nzValue]="item.key" [nzLabel]="item.value">
+							</nz-option>
+						</nz-select>&nbsp;&nbsp;
+					</section>
+				</div>
+				<div>
+					<section class="tpl-list flexa">
+						<span>路由:</span>&nbsp;&nbsp;
+						<input nz-input nzSize="small" placeholder="路由" [(ngModel)]="searchData['route']"
+							class="tpl-input" />&nbsp;&nbsp;
+					</section>
+				</div>
+				<div>
+					<section class="tpl-list flexa">
+						<span>管理用户:</span>&nbsp;&nbsp;
+						<nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['admin_id']"
+							nzAllowClear nzPlaceHolder="管理用户" class="tpl-input">
+							<nz-option [nzValue]="''" nzLabel="全部"></nz-option>
+							<nz-option *ngFor="let item of adminUserList | objkeys" [nzValue]="item"
+								[nzLabel]="adminUserList[item]">
+							</nz-option>
+						</nz-select>&nbsp;&nbsp;
+					</section>
+				</div>
+				<div>
+					<section class="tpl-list flexa">
+						<span>每页条数:</span>&nbsp;&nbsp;
+						<nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']"
+							nzAllowClear nzPlaceHolder="每页条数" class="tpl-input">
+							<nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+							<nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+							<nz-option [nzValue]="'30'" nzLabel="30条"></nz-option>
+						</nz-select>&nbsp;&nbsp;
+					</section>
+				</div>
+				<div>
+					<section class="tpl-list flexa tpl-list-time" style="width: 400px;">
+						<span>时间:</span>&nbsp;&nbsp;
+						<nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+							(nzOnCalendarChange)="onCelen($event)" (click)="timeHandle()" nzShowTime>
+						</nz-range-picker>&nbsp;&nbsp;
+					</section>
+				</div>
+				<div>
+					<section class="tpl-list flexa">
+						<button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i
+								nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+						<button nz-button nzSize="small" nzType="primary" class="select-reset"
+							(click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+					</section>
+				</div>
+			</section>
+			<nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+				<thead class="ant-table-thead">
+					<tr>
+						<th>ID</th>
+						<th>商户</th>
+						<th>管理员</th>
+						<th>路由</th>
+						<th>IP</th>
+						<th>代理服务器IP</th>
+						<th>城市</th>
+						<th>活动所需要的参数</th>
+						<th>行动</th>
+						<th>域名</th>
+						<th>设备</th>
+						<th>浏览器</th>
+						<th>平台</th>
+						<th>agent</th>
+						<th>更新时间</th>
+						<th>创建时间</th>
+					</tr>
+				</thead>
+				<tbody class="ant-table-tbody">
+					<tr *ngFor="let item of tableList">
+						<td>{{item.id}}</td>
+						<td>{{dateRangeList[item.partner_sign]}}</td>
+						<td>{{item.partner_admin_username}}</td>
+						<td>{{item.route}}</td>
+						<td>{{item.ip}}</td>
+						<td>{{item.proxy_ip}}</td>
+						<td>{{item.city}}</td>
+						<td>
+							<span (click)="lockTd(item)">
+								{{item.params}}
+							</span>
+						</td>
+						<td>{{item.action}}</td>
+						<td>{{item.domain}}</td>
+						<td>{{item.device}}</td>
+						<td>{{item.browser}}</td>
+						<td>{{item.platform}}</td>
+						<td>{{item.agent}}</td>
+						<td>{{item.updated_at}}</td>
+						<td>{{item.created_at}}</td>
+					</tr>
+				</tbody>
+			</nz-table>
+			<nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+				[(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+				class="nz-pagination">
+			</nz-pagination>
+		</section>
+	</section>
+	<nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+		(nzOnCancel)="contentPop.show = false">
+		<section class="fw content">
+			{{contentPop.data}}
+		</section>
+	</nz-modal>
+</nz-content>

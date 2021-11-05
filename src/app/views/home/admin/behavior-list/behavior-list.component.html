@@ -1,0 +1,108 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>管理员</nz-breadcrumb-item>
+    <nz-breadcrumb-item>关键行为</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      关键行为
+    </section>
+    <section class="main-content" style="margin-top:10px;">
+      <section class="mian-search">
+        <div>
+          <span>用户名:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" style="width: 150px;" nzPlaceHolder="请选择用户名" [(ngModel)]="page['admin_username']"
+            nzAllowClear class="tpl-input">
+            <nz-option *ngFor="let item of adminUser|keyvalue" [nzLabel]="item.value" [nzValue]="item.value">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          <span>分类:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" style="width: 150px;" nzPlaceHolder="请选择分类" [(ngModel)]="page['action']"
+            nzAllowClear class="tpl-input">
+            <nz-option *ngFor="let item of adminType" [nzLabel]="item.value" [nzValue]="item.key">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+        </div>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="3%">ID</th>
+            <th nzWidth="5%">管理ID</th>
+            <th nzWidth="7%">管理昵称</th>
+            <th nzWidth="9%">动作</th>
+            <th nzWidth="6%">内容</th>
+            <th nzWidth="9%">设备型号</th>
+            <th nzWidth="7%">浏览器</th>
+            <th nzWidth="7%">浏览器型号</th>
+            <th nzWidth="7%">平台</th>
+            <th nzWidth="7%">平台型号</th>
+            <th nzWidth="7%">IP</th>
+            <th nzWidth="7%">时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.admin_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.type}}</td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="doDetails(item)">详情</a>
+            </td>
+            <td>{{item.device_type}}</td>
+            <td>{{item.browser_type}}</td>
+            <td>{{item.browser_version}}</td>
+            <td>{{item.platform_type}}</td>
+            <td>{{item.platform_version}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.add_time}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+  <!-- 内容 -->
+  <nz-drawer [nzVisible]="detail.show" [nzMaskClosable]='false' nzWidth='1100' nzTitle="内容"
+    (nzOnClose)="detail.show = false">
+    <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.data | keyvalue">
+      <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="7%">ID</th>
+          <th nzWidth="10%">bank_name</th>
+          <th nzWidth="12%">bank_sign</th>
+          <th nzWidth="10%">branch</th>
+          <th nzWidth="15%">card_number</th>
+          <th nzWidth="10%">city_id</th>
+          <th nzWidth="10%">nickname</th>
+          <th nzWidth="10%">owner_name</th>
+          <th nzWidth="10%">province_id</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr>
+          <td>{{detail.data.id}}</td>
+          <td>{{detail.data.bank_name}}</td>
+          <td>{{detail.data.bank_sign}}</td>
+          <td>{{detail.data.branch}}</td>
+          <td>{{detail.data.card_number}}</td>
+          <td>{{detail.data.city_id}}</td>
+          <td>{{detail.data.nickname}}</td>
+          <td>{{detail.data.owner_name}}</td>
+          <td>{{detail.data.province_id}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-drawer>
+</nz-content>

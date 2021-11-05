@@ -1,0 +1,225 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>账户</nz-breadcrumb-item>
+    <nz-breadcrumb-item>帐变记录</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      帐变记录
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <section class="tpl-list flexa">
+          <span>商户:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" class="tpl-input" [(ngModel)]="searchData.partner_sign" nzAllowClear
+            nzPlaceHolder="商户">
+            <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>游戏玩法:</span>&nbsp;&nbsp;
+          <nz-cascader nzSize="small" class="tpl-input" [nzOptions]="lotteryOptions" [(ngModel)]="defaultSelect"
+            (ngModelChange)="doSelectLottery($event)" [nzLabelProperty]="'label'"></nz-cascader>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>用户ID:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData.user_id"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>用户名:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData.username"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>帐变类型:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" class="tpl-input" [(ngModel)]="searchData.type" nzAllowClear nzPlaceHolder="帐变类型">
+            <nz-option nzValue="" nzLabel="帐变类型"></nz-option>
+            <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+              *ngFor="let option of searchDataType | keyvalue "></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>订单ID:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="订单ID" [(ngModel)]="searchData.project_id"
+            class="tpl-input" />&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>时间:</span>&nbsp;&nbsp;
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" nzShowTime>
+          </nz-range-picker>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">账变ID</th>
+            <th nzWidth="5%">商户</th>
+            <th nzWidth="5%">用户ID</th>
+            <th nzWidth="6%">用户名</th>
+            <th nzWidth="5%">帐变</th>
+            <th nzWidth="6%">金额</th>
+            <th nzWidth="6%">彩种</th>
+            <th nzWidth="6%">订单号</th>
+            <th nzWidth="6%">奖期</th>
+            <th nzWidth="6%">关联用户</th>
+            <th nzWidth="7%">发前余额</th>
+            <th nzWidth="7%">余额</th>
+            <th nzWidth="6%">冻结前</th>
+            <th nzWidth="6%">冻结后</th>
+            <th nzWidth="5%">活动</th>
+            <th nzWidth="10%">时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.hash_id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.type_name}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.lottery_name}}</td>
+            <td><a *ngIf="item.project_id" (click)="doShowProjectDetail(item)">{{item.project_id}}</a></td>
+            <td>{{item.issue}}</td>
+            <td>{{item.related_id}}</td>
+            <td>{{item.before_balance}}</td>
+            <td>{{item.balance}}</td>
+            <td>{{item.before_frozen_balance}}</td>
+            <td>{{item.frozen_balance}}</td>
+            <td>{{item.activity_sign}}</td>
+            <td>{{item.created_at}}</td>
+            <td>
+              <a (click)="doShowCommissionDetail(item.id)" *ngIf="item.type_sign == 'commission_from_child'">返点</a>
+              <a (click)="doShowProjectDetail(item)">详情</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <nz-modal nzWidth='600' [(nzVisible)]="projectData.show" [nzFooter]="null" [nzClosable]='true' [nzTitle]="'账变详情'"
+    (nzOnCancel)="projectClose()">
+    <div class="lottery-number">
+      <!-- <div
+          :class="{'pk10-num' : currentLottery.series_id === 'pk10' || currentLottery.series_id === 'lhc'}"
+          style="overflow:hidden;display:inline-block"
+        > -->
+      <div style="overflow:hidden;display:inline-block;margin:0 auto" *ngIf="openNumber === 1">
+        <em *ngFor="let item of projectData.data['open_number']">{{item}}</em>
+      </div>
+    </div>
+    <section class="list">
+      <div class="li left">
+        游戏:
+      </div>
+      <div class="li">
+        {{projectData.data['lottery_name']}}
+      </div>
+      <div class="li left">
+        注单编号:
+      </div>
+      <div class="li">
+        {{projectData.data['hash_id']}}
+      </div>
+      <div class="li left">
+        玩法:
+      </div>
+      <div class="li">
+        {{projectData.data['method_name']}}
+      </div>
+      <div class="li left">
+        投注时间:
+      </div>
+      <div class="li">
+        {{projectData.data['time_bought']}}
+      </div>
+      <div class="li left">
+        期号:
+      </div>
+      <div class="li">
+        {{projectData.data['issue']}}
+      </div>
+      <div class="li left">
+        倍数:
+      </div>
+      <div class="li">
+        {{projectData.data['times']}}
+      </div>
+      <div class="li left">
+        模式:
+      </div>
+      <div class="li">
+        {{projectData.data['mode']}}
+      </div>
+      <div class="li left">
+        投注金额:
+      </div>
+      <div class="li">
+        {{projectData.data['total_cost']}}
+      </div>
+      <div class="li left">
+        状态:
+      </div>
+      <div class="li">
+        <span *ngIf="projectData.data['status']==0">待开奖</span>
+        <span *ngIf="projectData.data['status']==1">已撤单</span>
+        <span *ngIf="projectData.data['status']==2" style="color:red">未中奖</span>
+        <span *ngIf="projectData.data['status']==3" style="color:green">已中奖</span>
+        <span *ngIf="projectData.data['status']==4" style="color:red">系统撤销</span>
+      </div>
+      <div class="li left">
+        奖金:
+      </div>
+      <div class="li">
+        {{projectData.data['bonus']}}
+      </div>
+      <div class="li left">
+        单价:
+      </div>
+      <div class="li">
+        {{projectData.data['price']}}
+      </div>
+      <div class="li left">
+        单挑:
+      </div>
+      <div class="li">
+        <span *ngIf="projectData.data['is_challenge'] == '0'" style="color: red;">否</span>
+        <span *ngIf="projectData.data['is_challenge'] == '1'" style="color: green;">是</span>
+      </div>
+      <div class="li left">
+        注数:
+      </div>
+      <div class="li">
+        {{projectData.data['count']}}
+      </div>
+      <div class="li left">
+      </div>
+      <div class="li">
+      </div>
+    </section>
+    <section class="text">
+      <div>
+        投注内容：
+      </div>
+      <div>
+        <textarea style="width:500px" [disabled]="true" nz-input placeholder="" name="issue_desc"
+          [(ngModel)]="projectData.data['bet_number_view']"></textarea>
+      </div>
+    </section>
+  </nz-modal>
+</nz-content>

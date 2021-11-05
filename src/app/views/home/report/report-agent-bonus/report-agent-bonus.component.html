@@ -1,0 +1,102 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>报表</nz-breadcrumb-item>
+    <nz-breadcrumb-item>代理分红</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      代理分红
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <div>
+          <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign" nzAllowClear
+            nzPlaceHolder="商户">
+            <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          用户名:
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData.username"
+            class="select-lottery-input" />&nbsp;&nbsp;
+        </div>
+        <div>
+          用户ID:
+          <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData.user_id"
+            class="select-lottery-input" />&nbsp;&nbsp;
+        </div>
+        <div>
+          <nz-range-picker [(ngModel)]="dateRange" nzSize="small" (ngModelChange)="onChange($event)" nzShowTime>
+          </nz-range-picker>&nbsp;&nbsp;
+        </div>
+        <div>
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </div>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>id</th>
+            <th>用户id</th>
+            <th>商户</th>
+            <th>用户名</th>
+            <th>月份</th>
+            <th>总投注</th>
+            <th>总奖金</th>
+            <th>总撤单</th>
+            <th>总和值返款</th>
+            <th>总投注返点</th>
+            <th>总下级返点</th>
+            <th>总礼金</th>
+            <th>总工资</th>
+            <th>总分红</th>
+            <th>亏损</th>
+            <th>比例</th>
+            <th>应分红</th>
+            <th>实际分红</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.month}}-{{item.sort}}</td>
+            <td><span style="color:green;">{{item.total_bets }}</span></td>
+            <td><span style="color:red;">{{item.total_bonus}}</span></td>
+            <td><span style="color:green;">{{item.total_cancel}}</span></td>
+            <td><span style="color:green;">{{item.total_he_return}}</span></td>
+            <td><span style="color:green;">{{item.total_commission_from_bet}}</span></td>
+            <td><span style="color:green;">{{item.total_commission_from_child}}</span></td>
+            <td><span style="color:green;">{{item.total_gift}}</span></td>
+            <td><span style="color:green;">{{item.total_salary}}</span></td>
+            <td><span style="color:green;">{{item.total_dividend}}</span></td>
+
+            <td>{{item.profit}}</td>
+            <td>{{item.rate}}%</td>
+
+            <td>{{item.amount}}</td>
+            <td>{{item.real_amount}}</td>
+            <td>
+              <span *ngIf="item.status == '0'">初始化</span>
+              <span *ngIf="item.status == '1'" style="color: green;">已发放</span>
+              <span *ngIf="item.status == '2'" style="color: blue;">未亏损</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>

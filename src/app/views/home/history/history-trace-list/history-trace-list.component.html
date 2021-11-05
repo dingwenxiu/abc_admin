@@ -1,0 +1,107 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>追号历史数据</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            追号历史数据
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <section class="tpl-list flexa">
+                        <span>商户:</span>&nbsp;&nbsp;
+                        <nz-select nzSize="small" [(ngModel)]="searchData.partner_sign" nzAllowClear
+                            nzPlaceHolder="选择商户" class="tpl-input">
+                            <nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+                                *ngFor="let item of isdateRange|keyvalue">
+                            </nz-option>
+                        </nz-select>&nbsp;&nbsp;
+                    </section>
+                </div>
+                <div>
+                    <section class="tpl-list flexa tpl-list-time">
+                        <span>时间:</span>&nbsp;&nbsp;
+                        <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+                            (nzOnCalendarChange)="onCelen($event)" nzShowTime></nz-range-picker>
+                        &nbsp;&nbsp;
+                    </section>
+                </div>
+                <div>
+                    <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-search"
+                        (click)="doSearch()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+                    <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-reset"
+                        (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+                </div>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>商户</th>
+                        <th>id</th>
+                        <th>彩种名称</th>
+                        <th>彩票</th>
+                        <th>用户名</th>
+                        <th>玩法名</th>
+                        <th>单价</th>
+                        <th>投注号码</th>
+                        <th>注数</th>
+                        <th>IP</th>
+                        <th>圆角分模式</th>
+                        <th>追停</th>
+                        <th>总话费</th>
+                        <th>奖金组</th>
+                        <th>用户奖金组</th>
+                        <th>奖期状态</th>
+                        <th>完成期数</th>
+                        <th>取消期数</th>
+                        <th>完成金额</th>
+                        <th>奖金</th>
+                        <th>派奖总额</th>
+                        <th>开始奖期</th>
+                        <th>结束奖期</th>
+                        <th>现在奖期</th>
+                        <th>投注时间</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{dateRange[item.partner_sign]}}</td>
+                        <td>{{item.id}}</td>
+                        <td>{{item.user_id}}</td>
+                        <td>{{item.lottery_sign}}</td>
+                        <td>{{item.lottery_name}}</td>
+                        <td>{{item.username}}</td>
+                        <td>{{item.method_name}}</td>
+                        <td>{{item.price}}</td>
+                        <td>{{item.bet_number}}</td>
+                        <td>{{item.count}}</td>
+                        <td>{{item.ip}}</td>
+                        <td>{{item.is_tester}}</td>
+                        <td>{{item.mode}}</td>
+                        <td>{{item.win_stop}}</td>
+                        <td>{{item.trace_total_cost}}</td>
+                        <td>{{item.bet_prize_group}}</td>
+                        <td>{{item.user_prize_group}}</td>
+                        <td>{{item.total_issues}}</td>
+                        <td>{{item.finished_issues}}</td>
+                        <td>{{item.canceled_issues}}</td>
+                        <td>{{item.finished_amount}}</td>
+                        <td>{{item.canceled_amount}}</td>
+                        <td>{{item.total_bonus}}</td>
+                        <td>{{item.start_issue}}</td>
+                        <td>{{item.end_issue}}</td>
+                        <td>{{item.now_issue}}</td>
+                        <td>{{item.time_bought}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="1" [nzPageSize]='10' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+</nz-content>

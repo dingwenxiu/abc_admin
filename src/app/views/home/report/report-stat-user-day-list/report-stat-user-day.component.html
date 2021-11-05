@@ -1,0 +1,188 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>报表</nz-breadcrumb-item>
+    <nz-breadcrumb-item>用户日结</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      用户日结
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <div>
+          <span>商户:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign" nzAllowClear
+            nzPlaceHolder="商户" (ngModelChange)="changeSelect($event)">
+            <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          <span>商户:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData.username"
+            class="select-lottery-input" />&nbsp;&nbsp;
+        </div>
+        <div>
+          <span>时间:</span>&nbsp;&nbsp;
+          <nz-range-picker nzSize="small" [(ngModel)]="searchData.start_day" (ngModelChange)="onChange($event)"
+            nzShowTime></nz-range-picker>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </div>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="4%">日期<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="7%">用户名<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">充值<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">提现<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="5%">理赔<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="5%">扣减<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">投注<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">撤单<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">中奖<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">返点<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">转入<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="5%">转出<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="5%">礼金<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">工资<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">分红<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="5%">积分<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th nzWidth="6%">亏损<span *ngIf="!isShowPrivate" style="color: red;">(团)</span></th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>
+              {{item.day}}
+            </td>
+            <td>
+              {{item.username}}
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.recharge_amount}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_recharge_amount}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.withdraw_amount}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_withdraw_amount}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.system_transfer_add}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_system_transfer_add}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.system_transfer_reduce}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_system_transfer_reduce}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.bets}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_bets}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.cancel}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_cancel}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.bonus}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_bonus}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.commission}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_commission}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.transfer_from_parent}}</span>
+              <span *ngIf="!isShowPrivate">--</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.transfer_to_child}}</span>
+              <span *ngIf="!isShowPrivate">--</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.gift}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_gift}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.salary}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_salary}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.dividend}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_dividend}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.score}}</span>
+              <span *ngIf="!isShowPrivate">{{item.team_score}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate">{{item.profit}}</span>
+              <span *ngIf="!isShowPrivate">{{item.ream_profit}}</span>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="check(item.id)">对账</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="checkData.show" nzTitle="查帐" (nzOnClose)="back()">
+    <nz-table nzSize="middle" [nzData]="checkData.data" nzShowPagination="false">
+      <thead class="ant-table-thead">
+        <tr>
+          <th>指标</th>
+          <th>帐变 </th>
+          <th>统计 </th>
+          <th>销量 </th>
+          <th>日期 </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stat  of checkData.data">
+          <td>{{ stat.title }}</td>
+          <td>{{ stat.stat_amount }}</td>
+          <td>{{ stat.change_amount }}</td>
+          <td>{{ stat.sale_amount }}</td>
+          <td>{{ stat.day }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-drawer>
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="statDetailData.show" nzTitle="详情" (nzOnClose)="back()">
+    <nz-table nzSize="middle" [nzData]="statDetailData.data | keyvalue" nzShowPagination="false">
+      <thead class="ant-table-thead">
+        <tr>
+          <th>总发包</th>
+          <th>被抢次数</th>
+          <th>被抢中雷数</th>
+          <th>免死包数</th>
+          <th>概率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ statDetailData.data.send_packet_count }}</td>
+          <td>{{ statDetailData.data.total_be_fetched_count }}</td>
+          <td>{{ statDetailData.data.total_be_fetched_landmine_count }}</td>
+          <td>{{ statDetailData.data.send_packet_count }}</td>
+          <td>{{ statDetailData.data.rate }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-drawer>
+</nz-content>

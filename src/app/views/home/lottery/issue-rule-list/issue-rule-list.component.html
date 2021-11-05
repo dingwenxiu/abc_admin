@@ -1,0 +1,129 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>游戏管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>奖期规则</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section *ngIf="!edit.show" style="padding:12px; background: #fff; min-height: 360px;">
+    <!-- <button nz-button nzType="primary" (click)="edit.show = true" nzSize="small">添加规则</button> -->
+
+    <section class="header">
+      <i class="fa fa-table"></i>
+      奖期规则
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <span class="tpl-title tpl-title-search">游戏玩法:</span>
+        <nz-cascader [nzOptions]="lotteryOptions" [(ngModel)]="defaultSelect" nzSize="small" (ngModelChange)="doSelectLottery($event)">
+        </nz-cascader>&nbsp;&nbsp;
+        <button nz-button nzType="primary" (click)="editHandler([],1)" nzSize="small"><i nz-icon
+            type="plus-circle"></i>添加规则</button>&nbsp;
+      </section>
+    <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+      <!-- [nzLoading]="true"  [nzHideOnSinglePage]="true" -->
+      <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="5%">ID</th>
+          <th nzWidth="10%">彩种</th>
+          <th nzWidth="10%">开始时间</th>
+          <th nzWidth="10%">结束时间</th>
+          <th nzWidth="10%">首期时间</th>
+          <th nzWidth="10%">奖期时间</th>
+          <th nzWidth="10%">调整时间</th>
+          <th nzWidth="10%">录号时间</th>
+          <th nzWidth="5%">奖期数</th>
+          <th nzWidth="7%">状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of tableList">
+          <td>{{item.id}}</td>
+          <td>{{item.lottery_name}}</td>
+          <td>{{item.begin_time}}</td>
+          <td>{{item.end_time}}</td>
+          <td>{{item.first_time}}</td>
+          <td>{{item.issue_seconds}}</td>
+          <td>{{item.adjust_time}}</td>
+          <td>{{item.encode_time}}</td>
+          <td>{{item.issue_count}}</td>
+          <td>
+            <ng-container *ngIf="item.status; else elseTemplate">
+              <i class="fa fa-check txt-color-green"></i>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <i class="fa fa-times txt-color-red"></i> 
+            </ng-template>
+          </td>
+          <td>
+            <!-- <button nzSize="small" nz-button nzType="primary" (click)="details(item)">详情</button>&nbsp; -->
+            <a href="javascript:;" class="a-link" (click)="editHandler(item,0)">编辑</a>&nbsp;&nbsp;
+            <!-- <button nzSize="small" nz-button nzType="primary" (click)="editHandler(item,0)">编辑</button>&nbsp; -->
+            <nz-switch [(ngModel)]="item.status" (click)="lookState(item)" nzCheckedChildren="开" nzUnCheckedChildren="关"
+              class="switch"></nz-switch>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+    <nz-pagination [nzPageIndex]="1" [nzPageSize]='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+      (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+  </section>
+  </section>
+  <section *ngIf="edit.show" style="background:#fff;">
+    <nz-page-header (nzBack)="back()" nzBackIcon nzTitle="" nzSubtitle="编辑"></nz-page-header>
+    <section class="tpl-lists">
+      <section class="tpl-list flexa" *ngIf="editGame == true">
+        <span class="tpl-title">彩种:</span>
+        <!-- <nz-select style="width: 200px;" [(ngModel)]=".data.lottery_id" nzAllowClear>
+          <nz-option *ngFor="let option of lotteryOptions['children'] | keyvalue" [nzValue]="option.key"
+            [nzLabel]="option.value"></nz-option>
+        </nz-select> -->
+        <section class="select-lottery">
+          <nz-cascader [nzOptions]="lotteryOptions" [(ngModel)]="lotterySign"
+            (ngModelChange)="editSelectLottery($event)"></nz-cascader>
+        </section>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">开始时间:</span>
+        <nz-time-picker [(ngModel)]="edit.data.begin_time" [nzAddOn]="beginTime" #beginTimer></nz-time-picker>
+        <ng-template #beginTime>
+          <button nz-button nzSize="small" nzType="primary" (click)="beginTimer.close()">Ok</button>
+        </ng-template>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">结束时间:</span>
+        <nz-time-picker [(ngModel)]="edit.data.end_time" [nzAddOn]="endTime" #endTimer></nz-time-picker>
+        <ng-template #endTime>
+          <button nz-button nzSize="small" nzType="primary" (click)="endTimer.close()">Ok</button>
+        </ng-template>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">奖期周期:</span>
+        <input nz-input [(ngModel)]="edit.data.issue_seconds" placeholder="奖期周期" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">第一期结束时间:</span>
+        <nz-time-picker [(ngModel)]="edit.data.first_time" [nzAddOn]="addOnTemplate" #timePicker></nz-time-picker>
+        <ng-template #addOnTemplate>
+          <button nz-button nzSize="small" nzType="primary" (click)="timePicker.close()">Ok</button>
+        </ng-template>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">调整时间:</span>
+        <input nz-input [(ngModel)]="edit.data.adjust_time" placeholder="调整时间" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">录号修正时间:</span>
+        <input nz-input [(ngModel)]="edit.data.encode_time" placeholder="录号修正时间" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">总奖期:</span>
+        <input nz-input [(ngModel)]="edit.data.issue_count" placeholder="总奖期" class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" class="submit">
+        提交
+      </button>
+    </section>
+  </section>
+</nz-content>

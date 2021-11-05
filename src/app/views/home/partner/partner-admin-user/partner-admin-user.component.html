@@ -1,0 +1,140 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理员列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      商户管理员列表
+      <section class="fr fw">
+        <button nz-button nzType="primary" nzSize="small" (click)="addAdminUser()"><i nz-icon
+            type="plus-circle"></i>添加商户管理员</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button (click)='getDataList()' nzSize="small" style='width:100px; margin: 0 10px 0 0;' nz-button nzBlock
+          [nzType]="'dashed'" class="ant-btn__block mb-sm">
+          <i nz-icon nzType="redo" nzTheme="outline"></i>
+          <span>刷新</span>
+        </button>
+      </section>
+    </section>
+    <section class="main-content" style="margin-top: 10px;">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="partnerAdminList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>管理员ID</th>
+            <th>商户</th>
+            <th>登录邮箱</th>
+            <th>分配组</th>
+            <th>昵称</th>
+            <th>创建人</th>
+            <th>创建时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of partnerAdminList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>{{item.email}}</td>
+            <td>
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary">超级管理</button>&nbsp; -->
+              超级管理
+            </td>
+            <td>{{item.username}}</td>
+            <td>
+              <span *ngIf="item.add_admin_id">系统</span>
+              <span *ngIf="!item.add_admin_id">{{item.add_partner_admin_id}}</span>
+            </td>
+            <td>{{item.created_at}}</td>
+            <td>
+              <span *ngIf="item.status == 1" style="color: green;">可用</span>
+              <span *ngIf="item.status != 1" style="color: red;">禁用</span>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="lookJurisdiction(item.id)">查看权限</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="editPsw(item)">修改密码</a>&nbsp;&nbsp;
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="editAdminUser(item)">编辑</button>&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary"
+                (click)="lookJurisdiction(item.id)">查看权限</button>&nbsp;&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="editPsw(item)">修改密码</button>&nbsp;&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary">分配组</button>&nbsp; -->
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+  <!-- 添加商户管理员 -->
+  <nz-drawer [nzClosable]="addData.show" [nzVisible]="addData.show" [nzMaskClosable]='false' nzWidth='600px'
+    nzPlacement="right" [nzTitle]="addData.isAdd?'添加商户管理员':'编辑商户管理员'" (nzOnClose)="addData.show = false">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">名称:</span> <input nz-input [(ngModel)]="addData.data.username" placeholder="请输入创建的管理员名称"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">邮箱:</span> <input nz-input [(ngModel)]="addData.data.email" placeholder="请输入邮箱"
+          class="tpl-input" />
+      </section>
+      <section *ngIf='addData.isAdd' class="tpl-list flexa">
+        <span class="tpl-title">登录密码:</span> <input nz-input [(ngModel)]="addData.data.password" placeholder="请输入登录密码"
+          class="tpl-input" />
+      </section>
+      <section *ngIf='addData.isAdd' class="tpl-list flexa">
+        <span class="tpl-title">资金密码:</span> <input nz-input [(ngModel)]="addData.data.fund_password"
+          placeholder="请输入资金密码" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户标识:</span>
+        <nz-select class="tpl-input" [(ngModel)]="addData.data.partner_sign" nzAllowClear nzPlaceHolder="代理类型" (ngModelChange)="changeType($event)">
+          <nz-option *ngFor="let item of partnerList| keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">管理组:</span>
+        <nz-select class="tpl-input" [(ngModel)]="addData.data['group_id']" nzAllowClear nzPlaceHolder="管理组">
+          <nz-option *ngFor="let item of groupList" nzValue="{{item.id}}" nzLabel="{{item.name}}">
+          </nz-option>
+        </nz-select>
+      </section>
+      <button nz-button nzType="primary" (click)="submitTask()" [nzLoading]="addData.buttonLoading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+  <!-- 查看权限 -->
+  <nz-drawer [nzVisible]="lookData.hide" (nzOnClose)="lookData.hide = false" [nzClosable]="true" nzWidth='auto'
+    nzPlacement="right" [nzTitle]="'查看权限'">
+    <section class="drawer-box">
+      <nz-tree #nzTreeComponent [nzData]="nodes" nzCheckable (nzCheckBoxChange)="nzCheck($event)">
+      </nz-tree>
+    </section>
+    <!-- <button nz-button nzType="primary" (click)="confrigmodifyPermissions()">确认</button> -->
+  </nz-drawer>
+
+  <nz-modal [(nzVisible)]="isVisible" nzTitle="修改密码" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+    [nzOkLoading]="isOkLoading">
+    <!-- <section class="tpl-list flexa">
+      <span class="tpl-title">原密码:</span>&nbsp;<input nz-input [(ngModel)]="pswData.password" placeholder="请输入原密码"
+        class="tpl-input" />
+    </section> -->
+    <section class="tpl-list flexa">
+      <span class="tpl-title">新密码:</span>&nbsp;<input nz-input [(ngModel)]="pswData.password" placeholder="请输入原密码"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">操作者资金密码:</span>&nbsp;<input nz-input [(ngModel)]="pswData.fund_password" placeholder="请输入资金密码"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="padding-left:11px">备注:</span>&nbsp;&nbsp;<input nz-input [(ngModel)]="pswData.request_desc"
+        placeholder="请输入备注" class="tpl-input" />
+    </section>
+  </nz-modal>
+</nz-content>

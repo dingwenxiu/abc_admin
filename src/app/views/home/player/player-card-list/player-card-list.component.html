@@ -1,0 +1,109 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>玩家管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>银行卡</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      银行卡
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <section class="tpl-list flexa">
+          <span>商户:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" class="tpl-input" [(ngModel)]="searchData.partner_sign" nzAllowClear
+            nzPlaceHolder="商户">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>用户名:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>银行卡:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="银行卡" [(ngModel)]="searchData['card_number']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>支行:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="支行" [(ngModel)]="searchData['branch']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>开户行:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" [(ngModel)]="searchData['bank_name']" nzAllowClear
+            nzPlaceHolder="开户行" class="tpl-input">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of bankSignOption" [nzValue]="item.label" [nzLabel]="item.label"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>状态:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" [(ngModel)]="searchData['status']" nzAllowClear
+            nzPlaceHolder="状态" class="tpl-input">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option [nzValue]="'1'" [nzLabel]="'开启'"></nz-option>
+            <nz-option [nzValue]="'0'" [nzLabel]="'禁用'"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" nzSize="default" nzSize="small" class="select-search" (click)="search()"><i
+              nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="default" nzSize="small" class="select-reset"
+            (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="6%">商户</th>
+            <th nzWidth="10%">用户名</th>
+            <th nzWidth="8%">开户行</th>
+            <th nzWidth="15%">卡号</th>
+            <th nzWidth="9%">持卡人</th>
+            <th nzWidth="9%">支行</th>
+            <th nzWidth="5%">地区</th>
+            <th nzWidth="10%">上次更新</th>
+            <th nzWidth="4%">状态</th>
+            <!-- <th>操作</th> -->
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.bank_name}}</td>
+            <td>{{item.card_number}}</td>
+            <td>{{item.owner_name}}</td>
+            <td>{{item.branch}}</td>
+            <td>{{item.area}}</td>
+            <td>{{item.update_time}}</td>
+            <td>
+              <ng-container *ngIf="item.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <!-- <td>
+            <a href="javascript:;" class="a-link" (click)="getDetail(item.id)">查看</a>&nbsp;
+          </td> -->
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>

@@ -1,0 +1,94 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>支付厂商</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            支付厂商
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <!-- <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="resetVendorList()"><i nz-icon
+                        type="search"></i>搜索</button>&nbsp;&nbsp; -->
+                <button nz-button nzType="primary" nzSize="small" (click)="addVendor()"
+                    class="select-search">添加厂商</button>&nbsp;&nbsp;
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>id</th>
+                        <th>厂商名称</th>
+                        <th>厂商标识</th>
+                        <th>厂商url</th>
+                        <th>拉取</th>
+                        <th>IP白名单</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.id}}</td>
+                        <td>{{item.platform_name}}</td>
+                        <td>{{item.platform_sign}}</td>
+                        <td>{{item.platform_url}}</td>
+                        <td>{{item.is_pull == '1'?'是':'否'}}</td>
+                        <td>
+                            <span (click)="lockTd(item)">{{item.whitelist_ips}}</span>
+                        </td>
+                        <td>
+                            <a href="javascript:;" (click)="amendVendor(item)" class="a-link">编辑</a>
+                            <a href="javascript:;" (click)="delVendor(item.id)" nzType="info" class="a-link">删除</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageSize]='searchData.page_size' [nzTotal]="page.total" [(nzPageIndex)]="searchData.page_index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+    <nz-drawer [nzClosable]="true" nzWidth='540px' [nzVisible]="hide" nzPlacement="right" nzTitle="编辑"
+        (nzOnClose)="redactclose()">
+        <section class="drawer-box">
+            <section class="tpl-list flexa">
+                <span class="tpl-title">厂商名称:</span>
+                <input nz-input type="text" placeholder="请输入厂商名称" class="tpl-input"
+                    [(ngModel)]="redactData.platform_name" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">厂商标识:</span>
+                <input nz-input type="text" placeholder="请输入厂商标识" class="tpl-input"
+                    [(ngModel)]="redactData.platform_sign" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">厂商url:</span>
+                <input nz-input type="text" placeholder="请输入厂商url" class="tpl-input"
+                    [(ngModel)]="redactData.platform_url" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">拉取:</span>
+                <nz-radio-group [(ngModel)]="redactData.is_pull">
+                    <label nz-radio nzValue="1">是</label>
+                    <label nz-radio nzValue="0">否</label>
+                </nz-radio-group>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">IP白名单:</span>
+                <input nz-input type="text" placeholder="IP白名单" class="tpl-input"
+                    [(ngModel)]="redactData.whitelist_ips" />
+            </section>
+            <button nz-button style="margin-left:180px;" nzType="primary" (click)="submit()" class="submit">
+                提交
+            </button>
+        </section>
+    </nz-drawer>
+    <nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+        (nzOnCancel)="contentPop.show = false">
+        <section class="fw content">
+            {{contentPop.data}}
+        </section>
+    </nz-modal>
+</nz-content>

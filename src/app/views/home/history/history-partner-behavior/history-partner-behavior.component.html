@@ -1,0 +1,86 @@
+<nz-content style="margin:0 16px;">
+	<nz-breadcrumb style="margin:16px 0;">
+		<nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+		<nz-breadcrumb-item>首页</nz-breadcrumb-item>
+		<nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+		<nz-breadcrumb-item>商户行为历史记录</nz-breadcrumb-item>
+	</nz-breadcrumb>
+	<section style="padding:12px; background: #fff; min-height: 360px;">
+		<section class="header">
+			<i class="fa fa-table"></i>
+			商户行为历史记录
+		</section>
+		<section class="main-content">
+			<section class="mian-search"> 
+				<div>
+					<span>商户:</span>&nbsp;&nbsp;
+					<nz-select [(ngModel)]="searchData.partner_sign" nzAllowClear nzPlaceHolder="选择商户" class="tpl-input"
+						nzSize="small">
+						<nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+							*ngFor="let item of isDateRange|keyvalue">
+						</nz-option>
+					</nz-select>&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>管理用户:</span>&nbsp;&nbsp;
+					<nz-select [(ngModel)]="searchData.partner_admin_id" nzAllowClear nzPlaceHolder="选择商户"
+						class="tpl-input" nzSize="small">
+						<nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+							*ngFor="let item of adminUserList|keyvalue">
+						</nz-option>
+					</nz-select>&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>时间:</span>&nbsp;&nbsp;
+					<nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+						nzShowTime>
+					</nz-range-picker>&nbsp;&nbsp;
+				</div>
+				<div>
+					<button nz-button nzType="primary" class="select-search" (click)="doSearch()" nzSize="small"><i
+							nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+					<button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i
+							nz-icon type="sync"></i>重置</button>
+				</div>
+			</section>
+			<nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+				<thead class="ant-table-thead">
+					<tr>
+						<th>id</th>
+						<th>商户</th>
+						<th>管理用户</th>
+						<th>浏览器</th>
+						<th>操作</th>
+						<th>平台</th>
+						<th>域</th>
+						<th>地区</th>
+						<th>设备</th>
+						<th>代理IP</th>
+						<th>IP</th>
+						<th>访问时间</th>
+						<th>最后访问时间</th>
+					</tr>
+				</thead>
+				<tbody class="ant-table-tbody">
+					<tr *ngFor="let item of tableList">
+						<td>{{item.id}}</td>
+						<td>{{dateRange[item.partner_sign]}}</td>
+						<td>{{item.partner_admin_username}}</td>
+						<td>{{item.browser}}</td>
+						<td>{{item.action}}</td>
+						<td>{{item.platform}}</td>
+						<td>{{item.domain}}</td>
+						<td>{{item.city}}</td>
+						<td>{{item.device}}</td>
+						<td>{{item.proxy_ip}}</td>
+						<td>{{item.ip}}</td>
+						<td>{{item.created_at}}</td>
+						<td>{{item.updated_at}}</td>
+					</tr>
+				</tbody>
+			</nz-table>
+			<nz-pagination [nzPageIndex]="1" [nzPageSize]='10' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+				(nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+		</section>
+	</section>
+</nz-content>

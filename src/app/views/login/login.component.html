@@ -1,0 +1,41 @@
+<div class="login-content">
+  <form nz-form [formGroup]="validateForm" class="login-form">
+    <nz-form-item>
+      <div class="top">
+        <div class="head">
+          <img class="logo" src="../assets/logo-1.png">
+          <span class="title">管理平台</span>
+        </div>
+        <!-- <div class="desc">武林中最有影响力的《葵花宝典》；欲练神功，挥刀自宫</div> -->
+      </div>
+      <ul nz-menu nzMode="horizontal" style="text-align: center">
+        <li nz-menu-item nzSelected style="font-size: large">
+          账号密码登录
+        </li>
+      </ul>
+      <nz-form-control class="login-inputs">
+        <nz-input-group >
+          <input type="text" nz-input [(ngModel)]="username" formControlName="userName" placeholder="登录邮箱" />
+        </nz-input-group>
+        <nz-form-explain *ngIf="validateForm.get('userName')?.dirty && validateForm.get('userName')?.errors">请输入你的账户</nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group>
+          <input type="password" nz-input [(ngModel)]="password" formControlName="password" placeholder="登录密码" />
+        </nz-input-group>
+        <nz-form-explain *ngIf="validateForm.get('password')?.dirty && validateForm.get('password')?.errors">请输入你的密码</nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <label nz-checkbox formControlName="remember" [(ngModel)]="rememberPassword">
+          <span>自动登录</span>
+        </label>
+        <a class="login-form-forgot" class="login-form-forgot">忘记密码</a>
+        <button nz-button (click)="submitForm()" class="login-form-button" [nzType]="'primary'">登录</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</div>

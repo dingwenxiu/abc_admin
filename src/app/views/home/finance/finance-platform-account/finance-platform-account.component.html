@@ -1,0 +1,89 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>支付账户-开放渠道</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            支付账户-开放渠道
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <section class="select-lottery">
+                    <button nz-button nzType="primary" nzSize="small" (click)="reset()" class="select-search"><i nz-icon
+                            type="search"></i>重置</button>&nbsp;&nbsp;
+                </section>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>id</th>
+                        <th>支付账户ID</th>
+                        <th>后台名称</th>
+                        <th>后台备注</th>
+                        <th>支付方式标记</th>
+                        <th>创建时间</th>
+                        <th>设备</th>
+                        <th>单价</th>
+                        <th>手续费</th>
+                        <th>手续费来源</th>
+                        <th>返利</th>
+                        <th>手续费类型</th>
+                        <th>前台显示名</th>
+                        <th>前台</th>
+                        <th>等级</th>
+                        <th>最大金额</th>
+                        <th>最小金额</th>
+                        <th>商户标识</th>
+                        <th>支付厂商ID</th>
+                        <th>支付厂商标识</th>
+                        <th>排序</th>
+                        <th>状态</th>
+                        <th>支付类型标识</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.id}}</td>
+                        <td>{{item.account_id}}</td>
+                        <td>{{item.back_name}}</td>
+                        <td>{{item.back_remark}}</td>
+                        <td>{{item.channel_sign}}</td>
+                        <td>{{item.created_at}}</td>
+                        <td>{{item.device == '1'?'电脑端':item.device == '2'?'手机端':'全部'}}</td>
+                        <td>{{item.do_fixed_price}}</td>
+                        <td>{{item.fee_amount}}</td>
+                        <td>{{item.fee_from}}</td>
+                        <td>{{item.fee_return}}</td>
+                        <td>{{item.fee_type=='1'?'定额':'比例'}}</td>
+                        <td>{{item.front_name}}</td>
+                        <td>{{item.front_remark}}</td>
+                        <td>{{item.level}}</td>
+                        <td>{{item.max}}</td>
+                        <td>{{item.min}}</td>
+                        <td>{{item.partner_sign}}</td>
+                        <td>{{item.platform_channel_id}}</td>
+                        <td>{{item.platform_sign}}</td>
+                        <td>{{item.sort}}</td>
+                        <td>{{item.status=='1'?'启用':'停用'}}</td>
+                        <td>{{item.type_sign}}</td>
+                        <td>{{item.updated_at}}</td>
+                        <td>
+                            <a href="javascript:;" (click)="delVendor(item.id)" nzType="info"
+                                class="a-link">删除</a>&nbsp;&nbsp;
+                            <nz-switch [(ngModel)]="item.status" (click)="offStatus(item)" nzCheckedChildren="启用"
+                                nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="1" [(nzPageSize)]='page.page_size' [nzTotal]="page.total" [(nzPageIndex)]="page.page_index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+</nz-content>

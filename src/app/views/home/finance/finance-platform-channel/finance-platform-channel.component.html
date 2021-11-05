@@ -1,0 +1,150 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>支付厂商-开放渠道</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            支付厂商-开放渠道
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <span class="tpl-title tpl-title-search">支付厂商:</span>
+                    <nz-select nzSize="small" [(ngModel)]="searchData.platform_sign" nzAllowClear nzPlaceHolder="选择商户"
+                        class="tpl-input">
+                        <nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+                            *ngFor="let item of dateRange|keyvalue">
+                        </nz-option>
+                    </nz-select>&nbsp;&nbsp;
+                    <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-search"
+                        (click)="doSearch()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+                    <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-reset"
+                        (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>&nbsp;&nbsp;
+                </div>
+                <div>
+                    <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" (click)="addVendorditch()"
+                        class="select-search">添加厂商渠道</button>
+                </div>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>id</th>
+                        <th nzWidth="10%">银行码对照表</th>
+                        <th>支付厂商</th>
+                        <th>支付平台的标识</th>
+                        <th>支付平台的标识</th>
+                        <th>支付方式名称</th>
+                        <th>支付方式标记</th>
+                        <th>创建时间</th>
+                        <th>资金流向</th>
+                        <th>状态</th>
+                        <th>支付类型</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.id}}</td>
+                        <td>{{item.banks_code}}</td>
+                        <td>{{item.platform_child_sign}}</td>
+                        <td>{{item.platform_sign}}</td>
+                        <td>{{item.request_mode== '1'?'json':'jump'}}</td>
+                        <td>{{item.channel_name}}</td>
+                        <td>{{item.channel_sign}}</td>
+                        <td>{{item.created_at}}</td>
+                        <td>{{item.direction == '1'?'入款':'出款'}}</td>
+                        <td>
+                            <ng-container *ngIf="item.status == '1'; else elseTemplate">
+                                <i class="fa fa-check txt-color-green"></i>
+                            </ng-container>
+                            <ng-template #elseTemplate>
+                                <i class="fa fa-times txt-color-red"></i>
+                            </ng-template>
+                        </td>
+                        <td>{{item.type_sign}}</td>
+                        <td>{{item.updated_at}}</td>
+                        <td>
+                            <a href="javascript:;" (click)="amendVendorChannel(item)" class="a-link">编辑</a>
+                            <a href="javascript:;" (click)="delVendorChannel(item.id)" nzType="info"
+                                class="a-link">删除</a>
+                            <nz-switch [(ngModel)]="item.status" (click)="changeStatus(item)" nzCheckedChildren="启用"
+                                nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [(nzPageIndex)]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+    <nz-drawer [nzClosable]="true" nzWidth='540px' [nzVisible]="hide" nzPlacement="right" nzTitle="编辑"
+        (nzOnClose)="redactclose()">
+        <section class="drawer-box">
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付方式名称:</span>
+                <input style="width: 173px;" nz-input type="text" placeholder="请输入支付方式名称"
+                    [(ngModel)]="redactData.channel_name" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付方式标记:</span>
+                <input style="width: 173px;" nz-input type="text" placeholder="请输入支付方式标记"
+                    [(ngModel)]="redactData.channel_sign" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付方式请求地址:</span>
+                <input style="width: 173px;" nz-input type="text" placeholder="请输入支付方式请求地址"
+                    [(ngModel)]="redactData.gateway" />
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付的请求方式:</span>
+                <nz-select style="width: 173px;" [(ngModel)]="redactData.request_mode" nzAllowClear>
+                    <nz-option nzValue="0" nzLabel="jump"></nz-option>
+                    <nz-option nzValue="1" nzLabel="json"></nz-option>
+                </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">资金流向:</span>
+                <nz-select style="width: 173px;" [(ngModel)]="redactData.direction" nzAllowClear>
+                    <nz-option nzValue="0" nzLabel="出款"></nz-option>
+                    <nz-option nzValue="1" nzLabel="入款"></nz-option>
+                </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">状态:</span>
+                <nz-select style="width: 173px;" [(ngModel)]="redactData.status" nzAllowClear>
+                    <nz-option nzValue="0" nzLabel="下架"></nz-option>
+                    <nz-option nzValue="1" nzLabel="上架"></nz-option>
+                </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付平台的标识:</span>
+                <nz-select style="width: 173px;" [(ngModel)]="redactData.platform_sign" nzAllowClear>
+                    <nz-option [nzValue]='item.platform_sign' [nzLabel]='item.platform_sign'
+                        *ngFor="let item of payterracelist">
+                    </nz-option>
+                </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">支付类型:</span>
+                <nz-select style="width: 173px;" [(ngModel)]="redactData.type_sign" nzAllowClear>
+                    <nz-option [nzValue]='item.type_sign' [nzLabel]='item.type_sign' *ngFor="let item of payTypelist">
+                    </nz-option>
+                </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">银行码对照表:</span>
+                <input nz-input type="text" placeholder="请输入银行码对照表" style="width: 173px;"
+                    [(ngModel)]="redactData.banks_code" />
+            </section>
+            <button nz-button style="margin-left:180px;" nzType="primary" (click)="submit()" class="submit">
+                提交
+            </button>
+        </section>
+    </nz-drawer>
+</nz-content>

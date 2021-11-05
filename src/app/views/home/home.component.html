@@ -1,0 +1,103 @@
+<nz-header style="padding:0;height:58px;line-height:58px;" class="pr home-head">
+  <!-- <i class="trigger" nz-icon [type]="isCollapsed ? 'menu-unfold' : 'menu-fold'" (click)="collapsed()"></i> -->
+  <img src="../assets/logo-1.png" alt="logo" title="logo" class="dl logo">
+  <section class="header-infos">
+    <!-- <section class="user-info pr">
+      <span class="tpl-title">在线人数:</span>
+      {{onlineUsers}}
+    </section> -->
+    <section class="user-info pr">
+      <span class="tpl-title">登录地区:</span>
+      {{onlineaArea}}
+    </section>
+    <section class="user-info pr">
+      <span class="tpl-title">IP:</span>
+      {{onlineaIp}}
+    </section>
+    <section class="user-info pr">
+      <nz-avatar nzIcon="user" nzSrc="/assets/images/1001.jpg" class="avatar"></nz-avatar>
+      <nz-dropdown *ngIf="user['username']">
+        <a nz-dropdown class="name">{{user.username}}<i nz-icon type="down"></i> </a>
+        <ul nz-menu nzSelectable class="user-menu">
+          <li nz-menu-item>
+            <a (click)="SettingPassword()">修改密码</a>
+          </li>
+        </ul>
+      </nz-dropdown>
+    </section>
+    <section class="user-info pr">
+      <!-- <nz-dropdown>
+        <a nz-dropdown class="name">
+          前端快捷入口<i nz-icon type="down"></i>
+        </a>
+        <ul nz-menu nzSelectable class="user-menu user-menu-url">
+          <ng-template ngFor let-data [ngForOf]="domainList">
+            <li nz-menu-item>
+              <a [href]="'https://www' + data.domain" target="_blank">{{data.name}}</a>
+            </li>
+          </ng-template>
+        </ul>
+      </nz-dropdown> -->
+      <a [href]="'https://' + domainList['test_domain']" target="_blank" style="color: white;">前端快捷入口</a>
+    </section>
+    <i class="fa fa-arrows-alt fullScreen" (click)="fullScreen()"></i>
+    <i class="fa fa-sign-out logout" (click)="logout()"></i>
+  </section>
+</nz-header>
+<section class="mian flex">
+  <section class="side-bars">
+    <ul nz-menu [nzMode]="'inline'" class="side-bar">
+      <li nz-submenu *ngFor="let item of menuList" [(nzOpen)]='item.flag' (nzOpenChange)="openHandler(item.flag)"
+        class="side-bars-list">
+        <span title *ngIf="item.is_menu" style="font-size: 16px;"><i
+            class="{{item.css_class}} nav-icon"></i>{{item.title}}</span>
+        <ul class="menu-ul-boxs">
+          <li *ngFor="let subItem of item.childs; let key = index">
+            <ul *ngIf="subItem.is_menu">
+              <li nz-menu-item (click)="goPath(subItem)" [ngClass]='{"ant-menu-item-selected": subItem.flag}'>
+                {{subItem.title}}
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <section class="content">
+    <section class="head-links-boxs" *ngIf="headerList && headerList.length > 0">
+      <section class="head-links">
+        <span *ngFor="let item of headerList; let key = index" class="head-link"
+          [ngClass]="{'active': item.api_path === currentPath}" (click)="goPath(item)">
+          {{item.title}}
+          <i *ngIf="headerList.length !== 1" nz-icon nzType="close" nzTheme="outline" class="head-close"
+            (click)="closeTab(item, $event)"></i>
+        </span>
+      </section>
+    </section>
+    <router-outlet></router-outlet>
+    <nz-footer style="text-align: center;">游侠包网 ©2019 由 游侠团队 设计开发</nz-footer>
+  </section>
+</section>
+
+<nz-modal nzTitle="修改密码" nzWidth="360px" (nzOnOk)="subPassword()" [nzVisible]="passwordPop.show"
+  (nzOnCancel)="passwordPop.show = false">
+  <nz-tabset>
+    <nz-tab *ngFor="let tab of titleList" [nzTitle]="tab.title" (nzClick)="selectTab(tab.index)">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">旧密码:</span>
+        <input nz-input type="password" placeholder="请输入旧密码" [(ngModel)]="passwordPop.data['old_password']"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">密码:</span>
+        <input nz-input type="password" placeholder="请输入密码" [(ngModel)]="passwordPop.data['password']"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">确认密码:</span>
+        <input nz-input type="password" placeholder="确认密码" [(ngModel)]="passwordPop.data['confirm_password']"
+          class="tpl-input" />
+      </section>
+    </nz-tab>
+  </nz-tabset>
+</nz-modal>

@@ -1,0 +1,124 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      模板列表
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <div>
+          <span>选择商户:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign" nzAllowClear
+            nzPlaceHolder="选择商户" class="tpl-input">
+            <nz-option nzValue=" " nzLabel="全部"></nz-option>
+            <nz-option nzValue="{{item.sign}}" nzLabel="{{item.name}}" *ngFor="let item of dateRange">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="reset()"><i nz-icon
+              type="sync"></i>重置</button>&nbsp;&nbsp;
+        </div>
+        <div>
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="addModel()"><i nz-icon
+              type="plus-circle"></i>添加</button>
+        </div>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="10%">名称</th>
+            <th nzWidth="15%">
+              标识
+            </th>
+            <th nzWidth="10%">商户标识</th>
+            <th nzWidth="20%">模块标识</th>
+            <th nzWidth="8%">状态</th>
+            <th nzWidth="10%">创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>
+              <p class="text-content">
+                {{item.sign}}
+              </p>
+            </td>
+            <td>{{item.partner_sign}}</td>
+            <td (click)="lockTd(item)"
+              style="max-width: 400px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
+              <!-- <span *ngFor="let ele of item.module_sign|keyvalue">{{ele.value}}&nbsp;&nbsp;</span> -->
+              {{item.module_name}}
+            </td>
+            <td>
+              <ng-container *ngIf="item.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>{{item.updated_at}}</td>
+            <td id="operating">
+              <a href="javascript:;" class="a-link" (click)="checkDetail(item)">编辑</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <!-- <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+              (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination> -->
+    </section>
+  </section>
+  <!-- 编辑 -->
+  <!-- <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="520" [nzVisible]="config.show" nzTitle="编辑" (nzOnClose)="back()">
+    <section class="list_show">
+      <nz-select style="width:350px;margin-left:30px;" [nzMaxTagPlaceholder]="'请选择'" nzMode="multiple"
+        nzPlaceHolder="请选择" [(ngModel)]="selectedValue" (ngModelChange)="selectChange($event)">
+        <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.name" [nzValue]="option.sign"></nz-option>
+      </nz-select>
+      <button nz-button nzType="primary" (click)="submitConfig()" [nzLoading]="config.buttonLoading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer> -->
+
+  <nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="模板标示"
+    (nzOnCancel)="contentPop.show = false">
+    <section class="fw content">
+      {{contentPop.data}}
+    </section>
+  </nz-modal>
+
+  <nz-modal [(nzVisible)]="ModuleHide" (nzOnOk)="submitAdd()" nzTitle="{{isAdd == '1'?'添加':'编辑'}}"
+    (nzOnCancel)="ModuleHide = false">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">名称:</span>
+      <input nz-input placeholder="请输入名称" class="tpl-input" [(ngModel)]="addModule.name" />
+    </section>
+    <section *ngIf="isAdd === '1'" class="tpl-list flexa">
+      <span class="tpl-title">标识:</span>
+      <input nz-input placeholder="请输入标识" class="tpl-input" [(ngModel)]="addModule.sign" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">模块标识:</span>
+      <nz-checkbox-wrapper style="flex:1" (nzOnChange)="opentTime($event)">
+        <div nz-row>
+          <div nz-col nzSpan="10" *ngFor="let item of sign_list">
+            <label nz-checkbox [ngModel]="item.selected" [nzValue]="item">{{item.name}}</label></div>
+        </div>
+      </nz-checkbox-wrapper>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">状态:</span>
+      <nz-switch [ngModel]="addModule.status" (ngModelChange)="switch()" nzCheckedChildren="开" nzUnCheckedChildren="关">
+      </nz-switch>
+    </section>
+  </nz-modal>
+</nz-content>

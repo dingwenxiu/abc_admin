@@ -1,0 +1,62 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>玩家历史IP记录</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            玩家历史IP记录
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <span>商户:</span>&nbsp;&nbsp;
+                    <nz-select nzSize="small" [(ngModel)]="searchData.partner_sign" nzAllowClear nzPlaceHolder="选择商户"
+                        class="tpl-input">
+                        <nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+                            *ngFor="let item of dateRange |keyvalue"></nz-option>
+                    </nz-select>&nbsp;&nbsp;
+                </div>
+                <div>
+                    <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="doSearch()"><i
+                            nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+                    <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i
+                            nz-icon type="sync"></i>重置</button>
+                </div>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>商户</th>
+                        <th>ID</th>
+                        <th>总代ID</th>
+                        <th>用户ID</th>
+                        <th>用户名</th>
+                        <th>地区</th>
+                        <th>登录次数</th>
+                        <th>IP</th>
+                        <th>访问时间</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{dateRange[item.partner_sign]}}</td>
+                        <td>{{item.id}}</td>
+                        <td>{{item.top_id}}</td>
+                        <td>{{item.user_id}}</td>
+                        <td>{{item.username}}</td>
+                        <td>{{item.country + '/' + item.city}}</td>
+                        <td>{{item.login_count}}</td>
+                        <td>{{item.ip}}</td>
+                        <td>{{item.created_at}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="1" [nzPageSize]='10' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+</nz-content>

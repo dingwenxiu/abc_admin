@@ -1,0 +1,189 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>系统</nz-breadcrumb-item>
+    <nz-breadcrumb-item>配置列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      配置列表
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <button nz-button nzType="primary" (click)="addConfigure(0,'0')" nzSize="small"><i nz-icon
+          type="plus-circle"></i>添加配置</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" (click)="doFlush()" nzSize="small"><i nz-icon
+          type="sync"></i>刷新配置</button>
+      </section>
+      <nz-breadcrumb nzSeparator=">" *ngIf="parent.id > 0">
+        <nz-breadcrumb-item>
+          <a (click)="toParent(0)">返回根目录>></a>
+        </nz-breadcrumb-item>
+      </nz-breadcrumb>
+      <nz-table #nestedTable [nzData]="tableList" [nzPageSize]="10">
+        <thead>
+          <tr class="tableTitle">
+            <th nzShowExpand>操作</th>
+            <th>标识</th>
+            <th>名称</th>
+            <th>值</th>
+            <th>描述</th>
+            <th>可显示</th>
+            <th>可编辑</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-template ngFor let-data [ngForOf]="nestedTable.data">
+            <tr>
+              <td nzShowExpand [(nzExpand)]="data.expand"></td>
+              <td>{{ data.sign }}</td>
+              <td>{{ data.name }}</td>
+              <td>{{ data.value }}</td>
+              <td>{{ data.description }}</td>
+              <td>
+                <ng-container *ngIf="data.partner_show; else elseTemplate">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="data.partner_edit; else elseTemplate">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="data.status; else elseTemplate">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+              </td>
+              <td>
+                <a href="javascript:;" class="a-link" (click)="addConfigure(data.id,'1')">编辑</a>&nbsp;&nbsp;
+                <nz-switch [(ngModel)]="data.status" [nzControl]='true' (click)="doStatus(data)"
+                nzCheckedChildren="开" nzUnCheckedChildren="关" class="switch"></nz-switch>
+              </td>
+            </tr>
+            <tr [nzExpand]="data.expand">
+              <td></td>
+              <td colspan="7">
+                <nz-table #innerTable [nzData]="data.child" nzSize="middle" [nzShowPagination]="false">
+                  <thead>
+                    <tr class="tableTitle">
+                      <th>标识</th>
+                      <th>名称</th>
+                      <th>值</th>
+                      <th>描述</th>
+                      <th>可显示</th>
+                      <th>可编辑</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+        <tbody>
+          <tr *ngFor="let data of data.child">
+            <td>{{ data.sign }}</td>
+            <td>{{ data.name }}</td>
+            <td>{{ data.value }}</td>
+            <td>{{ data.description }}</td>
+            <td>
+              <ng-container *ngIf="data.partner_show; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="data.partner_edit; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="data.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="addConfigure(data.id)">编辑</a>&nbsp;&nbsp;
+              <nz-switch [(ngModel)]="data.status" [nzControl]='true' (click)="doStatus(data)"
+              nzCheckedChildren="开" nzUnCheckedChildren="关" class="switch"></nz-switch>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      </td>
+      </tr>
+      </ng-template>
+      </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="460" [nzVisible]="edit.show" nzTitle="编辑/添加" (nzOnClose)="back()">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">上级:</span>
+        <nz-select [disabled]="true" style="width: 150px;" [(ngModel)]="edit.data.pid" nzAllowClear nzPlaceHolder="代理类型">
+          <nz-option *ngFor="let item of pidList" nzValue="{{item.pid}}" nzLabel="{{item.name}}">
+          </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa" *ngIf="parent.id > 0">
+        <span class="tpl-title">上级:</span> <input required [disabled]="true" nz-input [(ngModel)]="parent.name" placeholder=""
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">名称:</span> <input [disabled]="true" required nz-input [(ngModel)]="edit.data.name" placeholder="请输入名称"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">标识:</span> <input nz-input [(ngModel)]="edit.data.sign" placeholder="请输入标识"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">值:</span>
+        <textarea nz-input [(ngModel)]="edit.data.value" placeholder="请输入值" class="tpl-input"
+          [nzAutosize]="{ minRows: 2, maxRows: 6 }"></textarea>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">可编辑:</span>
+        <nz-switch [(ngModel)]="edit.data.partner_edit"></nz-switch>
+      </section>
+      <!-- <section class="tpl-list flexa">
+        <span class="tpl-title">父级ID:</span>
+        <input nz-input [(ngModel)]="edit.data.pid" placeholder="请输入父级ID" class="tpl-input" />
+      </section> -->
+      <section class="tpl-list flexa">
+        <span class="tpl-title">可显示:</span>
+        <nz-switch [(ngModel)]="edit.data.partner_show"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">输入框:</span> <input nz-input [(ngModel)]="edit.data.description" placeholder="请输入描述"
+          class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" [nzLoading]="edit.buttonLoading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

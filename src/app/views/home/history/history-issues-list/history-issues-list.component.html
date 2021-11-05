@@ -1,0 +1,70 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>历史数据</nz-breadcrumb-item>
+        <nz-breadcrumb-item>历史奖期记录</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            历史奖期记录
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <span>游戏系列:</span>&nbsp;&nbsp;
+                    <nz-cascader [nzOptions]="lotteryOptions" nzSize="small" [(ngModel)]="defaultSelect"
+                        (ngModelChange)="doSelectLottery($event)" [nzLabelProperty]="'label'"
+                        style="width: 150px;height: 25px;"></nz-cascader>
+                    &nbsp;&nbsp;
+                </div>
+                <div>
+                    <span>奖期:</span>&nbsp;&nbsp;
+                    <input nz-input placeholder="输入奖期号" nzSize="small" [(ngModel)]="searchData.issue"
+                        class="tpl-input" />&nbsp;&nbsp;
+                </div>
+                <div>
+                    <span class="tpl-title">时间:</span>&nbsp;&nbsp;
+                    <nz-range-picker [(ngModel)]="dateRange" nzSize="small" (ngModelChange)="onChange($event)"
+                        nzShowTime>
+                    </nz-range-picker>&nbsp;&nbsp;
+                    <button nzSize="small" nz-button nzType="primary" class="select-search" (click)="doSearch()"><i nz-icon
+                        type="search"></i>搜索</button>&nbsp;&nbsp;
+                    <button nzSize="small" nz-button nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+                        type="sync"></i>重置</button>
+                </div>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>彩种名称</th>
+                        <th>英文名</th>
+                        <th>奖期</th>
+                        <th nzWidth="8%">开始时间</th>
+                        <th nzWidth="8%">结束时间</th>
+                        <th>开奖号码</th>
+                        <th>开奖状态</th>
+                        <th>返点状态</th>
+                        <th>追号状态</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.lottery_sign}}</td>
+                        <td>{{item.lottery_name}}</td>
+                        <td>{{item.issue}}</td>
+                        <td>{{item.begin_time}}</td>
+                        <td>{{item.end_time}}</td>
+                        <td>{{item.official_code}}</td>
+                        <td>{{item.status_process}}</td>
+                        <td>{{item.status_commission}}</td>
+                        <td>{{item.status_trace}}</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="1" [nzPageSize]='10' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+</nz-content>

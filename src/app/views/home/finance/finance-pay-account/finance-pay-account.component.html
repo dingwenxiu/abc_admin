@@ -1,0 +1,72 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>充提管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>支付账户</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            支付账户
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <section class="select-lottery">
+                    <button nz-button nzType="primary" nzSize="small" (click)="reset()" class="select-search"><i nz-icon
+                            type="search"></i>重置</button>&nbsp;&nbsp;
+                </section>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>id</th>
+                        <th>第三方终端号</th>
+                        <th>回调地址</th>
+                        <th>创建时间</th>
+                        <th>网关</th>
+                        <th>商户号</th>
+                        <th>商户秘钥</th>
+                        <th>商户</th>
+                        <th>第三方域名</th>
+                        <th>支付厂商</th>
+                        <th>支付厂商标识</th>
+                        <th>第三方私钥</th>
+                        <th>第三方公钥</th>
+                        <th>状态</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.id}}</td>
+                        <td>{{item.app_id}}</td>
+                        <td>{{item.callback_url}}</td>
+                        <td>{{item.created_at}}</td>
+                        <td>{{item.gateway}}</td>
+                        <td>{{item.merchant_code}}</td>
+
+                        <td>{{item.merchant_secret}}</td>
+                        <td>{{item.partner_sign}}</td>
+                        <td>{{item.platform_domain_url}}</td>
+                        <td>{{item.platform_name}}</td>
+                        <td>{{item.platform_sign}}</td>
+                        <td>{{item.private_key}}</td>
+                        <td>{{item.public_key}}</td>
+                        <td>{{item.status == 1?'启用':'停用'}}</td>
+                        <td>{{item.updated_at}}</td>
+                        <td>
+                            <a href="javascript:;" (click)="delVendor(item.id)" nzType="info"
+                                class="a-link">删除</a>&nbsp;&nbsp;
+                            <nz-switch [(ngModel)]="item.status" (click)="offStatus(item)" nzCheckedChildren="启用"
+                                nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="1" [nzPageSize]='10' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+</nz-content>

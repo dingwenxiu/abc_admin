@@ -1,0 +1,52 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>活动管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>注册送活动</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      注册送活动
+    </section>
+    <section class="main-content">
+      <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData.user_id" class="select-lottery-input" />&nbsp;&nbsp;
+      <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData.username" class="select-lottery-input" />&nbsp;&nbsp;
+      <nz-select  nzSize="small" style="width: 120px;" [(ngModel)]="searchData.type" nzAllowClear nzPlaceHolder="代理类型">
+        <nz-option nzValue="all" nzLabel="全部"></nz-option>
+        <nz-option  *ngFor="let item of type_options | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}"></nz-option>
+      </nz-select>&nbsp;&nbsp;
+      <button nz-button nzType="primary" class="select-search" (click)="doSearch()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+      <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="18%">活动</th>
+            <th nzWidth="8%">用户ID</th>
+            <th nzWidth="12%">用户名</th>
+            <th nzWidth="12%">昵称</th>
+            <th nzWidth="12%">领取金额</th>
+            <th nzWidth="12">领取时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>
+              <span *ngIf='item.type === 1' style="color: green;">注册送礼金</span>
+              <span *ngIf='item.type === 2' style="color: green;">绑手机送礼金</span>
+              <span *ngIf='item.type === 3' style="color: green;">推广送礼金</span>
+            </td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.nickname}}</td>
+            <td>{{item.bonus}}</td>
+            <td>{{utils.formatTime(item.fetch_time)}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>

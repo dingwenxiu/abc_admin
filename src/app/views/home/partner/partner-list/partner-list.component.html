@@ -1,0 +1,425 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      商户列表
+      <section class="fr fw">
+        <button nz-button nzType="primary" nzSize="small" (click)="addPartner()">添加商户</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button (click)='getDataList()' nzSize="small" style='width:100px; margin: 0 10px 0 0;' nz-button nzBlock
+          [nzType]="'dashed'" class="ant-btn__block mb-sm">
+          <i nz-icon nzType="redo" nzTheme="outline"></i>
+          <span>刷新</span>
+        </button>
+      </section>
+    </section>
+    <section class="mian-search">
+      <div>
+        <span>选择商户:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" style="width: 150px;" nzPlaceHolder="请选择商户" [(ngModel)]="searchData['sign']"
+          nzAllowClear class="tpl-input">
+          <nz-option *ngFor="let item of merchants|keyvalue" [nzLabel]="item.value" [nzValue]="item.key"></nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+            type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+            type="sync"></i>重置</button>
+      </div>
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="partnerList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>商户ID</th>
+            <th>商户名称</th>
+            <th>商户标识</th>
+            <th>商户logo</th>
+            <th>商户域名</th>
+            <th>备注</th>
+            <th>控水</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of partnerList">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.sign}}</td>
+            <td>
+              <section class="tpl-list flexa" *ngIf="!item.logo_image_partner">
+                <nz-upload [nzAction]="api.domain + '/admin-api/partner/partnerSetUploadImage/'+ item.id"
+                  (nzChange)='listImages($event,item)'>
+                  <button nz-button><i nz-icon nnzOnCancelzType="upload"></i><span>上传图片</span></button>
+                </nz-upload>
+              </section>
+              <section class="tpl-list flexa" *ngIf="item.logo_image_partner">
+                <section class="img-box">
+                  <img style="max-height: 55px;" [src]="api.imgUrl + '/' + item.logo_image_partner">
+                  <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg(item)"></i>
+                </section>
+              </section>
+            </td>
+            <td>
+              <div *ngFor="let item of webDomian">{{item.domain}}</div>
+            </td>
+            <td>{{item.remark}}</td>
+            <td>
+              <nz-switch [(ngModel)]="item.rate_open" (ngModelChange)="rateOpen(item)" nzCheckedChildren="启用"
+                nzUnCheckedChildren="关闭" class="switch"></nz-switch>
+              <!-- <ng-container *ngIf="item.rate_open; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+            </ng-template> -->
+            </td>
+            <td>
+              <!-- <a href="javascript:;" class="a-link" (click)="detailsHandler(item)">详情</a> -->
+              <a href="javascript:;" class="a-link" (click)="partnerSetCasino(item)">娱乐城设置</a>
+              <!-- <a href="javascript:;" class="a-link" (click)="setMenu(item)">设置菜单</a> -->
+              <a href="javascript:;" class="a-link" (click)="setMerchants(item)">设置模板</a>
+              <a *ngIf="testWeb" href="javascript:;" class="a-link" (click)="addTestWeb(item)">设置测试域名</a>&nbsp;&nbsp;
+
+              <!-- <a href="javascript:;" class="a-link" (click)="setActivity(item)">设置活动</a> -->
+              <!-- <a href="javascript:;" class="a-link" (click)="checkDomain(item)">展示domain</a> -->
+              <!-- <a href="javascript:;" class="a-link" >设置图片</a> -->
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 展示domain -->
+  <nz-modal nzWidth='500' [(nzVisible)]="domainPop.show" nzTitle="设置活动" (nzOnCancel)="domainPop.show = false"
+    [nzCancelText]="null" [nzOkText]="null">
+    <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="domainPop.data">
+      <thead class="ant-table-thead">
+        <tr>
+          <th>域名</th>
+          <th>域名说明</th>
+          <th>域名资料库名称</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of domainPop.data">
+          <td>{{item.domain}}</td>
+          <td>{{item.domain_desc}}</td>
+          <td>{{item.name}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-modal>
+
+  <!-- 设置商户后台图标 -->
+  <nz-modal nzWidth='500' [(nzVisible)]="eidtImgData.show" (nzOnCancel)="cloneImg()" nzTitle="设置商户后台图标"
+    [nzCancelText]="null" (nzOnOk)="subminImg()">
+    <section class="tpl-list flexa" *ngIf="!temp_avatars">
+      <span class="tpl-title">上传头像:</span>
+      <nz-upload [nzAction]="api.domain + '/admin-api/partner/partnerSetUploadImage/'+ imgId"
+        (nzChange)='listImages($event)'>
+        <button nz-button><i nz-icon nnzOnCancelzType="upload"></i><span>上传图片</span></button>
+      </nz-upload>
+    </section>
+    <section class="tpl-list flexa" *ngIf="temp_avatars">
+      <span class="tpl-title">上传头像:</span>
+      <section class="img-box">
+        <img style="max-height: 55px;" [src]="api.imgUrl + '/' + temp_avatars">
+        <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg()"></i>
+      </section>
+    </section>
+  </nz-modal>
+
+  <!-- 添加商户 -->
+  <nz-modal nzWidth='800' [(nzVisible)]="addData.show" [nzFooter]="modalFooter" [nzTitle]="addData.isAdd?'添加商户':'编辑商户'"
+    (nzOnCancel)="addData.show = false">
+    <nz-steps [nzCurrent]="curentPage" nzSize="small">
+      <nz-step nzTitle="商户基础信息"></nz-step>
+      <!-- <nz-step nzTitle="设置直属"></nz-step> -->
+      <nz-step nzTitle="设置超管信息"></nz-step>
+      <nz-step nzTitle="输入商户域名"></nz-step>
+      <nz-step nzTitle="娱乐城配置"></nz-step>
+      <nz-step nzTitle="设置商户模板"></nz-step>
+    </nz-steps>
+    <div>
+      <nz-alert style="margin-top: 20px;" *ngIf='curentPage==1' class="pb-lg" [nzMessage]="'直属为该商户下直属玩家！'"
+        [nzShowIcon]="true" [nzCloseable]="true"></nz-alert>
+      <nz-alert style="margin-top: 20px;" *ngIf='curentPage==2' class="pb-lg"
+        [nzMessage]="'超级管理员为改商户下后台拥有超级管理员权限的管理人员！'" [nzShowIcon]="true" [nzCloseable]="true"></nz-alert>
+    </div>
+    <form style="margin-top: 20px;" nz-form>
+      <nz-form-item *ngIf='curentPage==0'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="name">商户名称</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+
+          <input nz-input name="name" id="name" [(ngModel)]="addData.data.name" placeholder="请输入分类中文名" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==0'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="sign">商户标识</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="sign" id="sign" [(ngModel)]="addData.data.sign" placeholder="请输入分类编号/英文或者数字组成" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==1'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="admin_email">超管登录邮箱</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="admin_email" id="admin_email" [(ngModel)]="addData.data.admin_email"
+            placeholder="超管登录邮箱/用于登录商户后台" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==1'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="admin_password">超管登录密码</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="admin_password" id="admin_password" [(ngModel)]="addData.data.admin_password"
+            placeholder="超管登录密码" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==1'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="admin_fund_password">超管资金密码</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="admin_fund_password" id="admin_fund_password"
+            [(ngModel)]="addData.data.admin_fund_password" placeholder="超管资金密码" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==1'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="remark">备注</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="remark" id="remark" [(ngModel)]="addData.data.remark" placeholder="请输入备注" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==2'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="addData.data.host">输入商户域名</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="addData.data.host" id="addData.data.host" [(ngModel)]="addData.data.host"
+            placeholder="输入商户域名" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==3'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_secret_key">key</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_secret_key" id="casino_secret_key" [(ngModel)]="addData.data.casino_secret_key"
+            placeholder="请输入key" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==3'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_merchant">代理名称</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_merchant" id="casino_merchant" [(ngModel)]="addData.data.casino_merchant"
+            placeholder="请输入代理名称" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==3'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_gateway">地址</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_secret_key" id="casino_gateway" [(ngModel)]="addData.data.casino_gateway"
+            placeholder="地址" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==3'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_encryption_time">过期时间</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input [disabled]="true" nz-input name="casino_encryption_time" id="admin_fund_password"
+            [(ngModel)]="addData.data.casino_encryption_time" placeholder="过期时间" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf='curentPage==4'>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_encryption_time">设置商户模板</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-select nzPlaceHolder="请选择" class="tpl-input" [(ngModel)]="seedTemplate" name="add_template_sign"
+            (ngModelChange)="selectChange($event,'1')">
+            <nz-option *ngFor="let option of receiveTemplate" [nzLabel]="option.label" [nzValue]="option.value">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+
+      <nz-form-item>
+        <nz-form-control>
+          <ng-template #modalFooter>
+            <button nz-button nzType="default" (click)="addData.show = false">取消</button>
+            <button nz-button nzType="primary" *ngIf='curentPage>0' (click)="nextCurent('less')"
+              [nzLoading]="addData.buttonLoading">上一步</button>
+            <button nz-button nzType="primary" *ngIf='curentPage<4' (click)="nextCurent('add')"
+              [nzLoading]="addData.buttonLoading">下一步</button>
+            <button nz-button nzType="primary" *ngIf='curentPage>=4' (click)="submitPartner()"
+              [nzLoading]="addData.buttonLoading">提交</button>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+
+
+    <!-- <section style="margin-top: 20px;" class="tpl-lists">
+      <section *ngIf='curentPage==0' class="tpl-list flexa">
+        <span class="tpl-title">商户名称:</span> <input nz-input [(ngModel)]="addData.data.name" placeholder="请输入分类中文名"
+          class="tpl-input" />
+      </section>
+      <section *ngIf='curentPage==0' class="tpl-list flexa">
+        <span class="tpl-title">商户标识:</span> <input nz-input [(ngModel)]="addData.data.sign"
+          placeholder="请输入分类编号/英文或者数字组成" class="tpl-input" />
+      </section>
+
+      <section *ngIf='curentPage==1' class="tpl-list flexa">
+        <span class="tpl-title">直属名称:</span> <input nz-input [(ngModel)]="addData.data.top_player_username"
+          placeholder="请输入直属名称/前台登录直属名" class="tpl-input" />
+      </section>
+      <section *ngIf='curentPage==1' class="tpl-list flexa">
+        <span class="tpl-title">直属密码:</span> <input nz-input [(ngModel)]="addData.data.password"
+          placeholder="请输入直属登录密码/前台登录密码" class="tpl-input" />
+      </section>
+
+      <section *ngIf='curentPage==2' class="tpl-list flexa">
+        <span class="tpl-title">超管登录邮箱:</span> <input nz-input [(ngModel)]="addData.data.admin_email"
+          placeholder="超管登录邮箱/用于登录商户后台" class="tpl-input" />
+      </section>
+
+      <section *ngIf='curentPage==2' class="tpl-list flexa">
+        <span class="tpl-title">超管登录密码:</span> <input nz-input [(ngModel)]="addData.data.admin_password"
+          placeholder="超管登录密码" class="tpl-input" />
+      </section>
+
+      <section *ngIf='curentPage==2' class="tpl-list flexa">
+        <span class="tpl-title">超管安全密码:</span> <input nz-input [(ngModel)]="addData.data.admin_fund_password"
+          placeholder="超管安全密码" class="tpl-input" />
+      </section>
+      <section *ngIf='curentPage==2' class="tpl-list flexa">
+        <span class="tpl-title">备注:</span>
+        <input nz-input [(ngModel)]="addData.data.remark" placeholder="请输入备注" class="tpl-input" />
+      </section>
+
+    </section>
+    <ng-template #modalFooter>
+      <button nz-button nzType="default" (click)="addData.show = false">取消</button>
+      <button nz-button nzType="primary" *ngIf='curentPage>0' (click)="nextCurent('less')"
+        [nzLoading]="addData.buttonLoading">上一步</button>
+      <button nz-button nzType="primary" *ngIf='curentPage<2' (click)="nextCurent('add')"
+        [nzLoading]="addData.buttonLoading">下一步</button>
+      <button nz-button nzType="primary" *ngIf='curentPage>=2' (click)="submitPartner()"
+        [nzLoading]="addData.buttonLoading">提交</button>
+    </ng-template> -->
+
+  </nz-modal>
+
+  <!-- 设置娱乐城平台 -->
+  <nz-modal nzWidth='1000' [nzOkLoading]='casinoData.buttonLoading' [(nzVisible)]="casinoData.show" nzTitle="设置娱乐城平台"
+    (nzOnCancel)="cancelCasino()" (nzOnOk)="submitCasino()">
+    <div>
+      <div style='text-align: center;margin-bottom: 10px;'>商户：{{recreationData.partner_sign}}</div>
+      <nz-form-item>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_secret_key">key</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_secret_key" id="casino_secret_key" [(ngModel)]="recreationData.casino_secret_key"
+            placeholder="请输入key" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_merchant">代理名称</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_merchant" id="casino_merchant" [(ngModel)]="recreationData.casino_merchant"
+            placeholder="请输入代理名称" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_gateway">地址</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input nz-input name="casino_secret_key" id="casino_gateway" [(ngModel)]="recreationData.casino_gateway"
+            placeholder="地址" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired [nzSpan]="6" nzFor="casino_encryption_time">过期时间</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input [disabled]="true" nz-input name="casino_encryption_time" id="admin_fund_password"
+            [(ngModel)]="recreationData.casino_encryption_time" placeholder="过期时间" />
+        </nz-form-control>
+      </nz-form-item>
+      <!-- <section class="tpl-list flexa">
+        <span class="tpl-title">商户平台配置:</span> <input nz-input [(ngModel)]="casinoData.data.casino_platform_id"
+          placeholder="请输入分类中文名" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户site_id配置:</span> <input nz-input [(ngModel)]="casinoData.data.casino_site_id"
+          placeholder="请输入分类中文名" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">选择平台:</span>
+        <div style='width: 100%;' class="tpl-input">
+          <label nz-checkbox [(ngModel)]="allChecked" (ngModelChange)="updateAllChecked()"
+            [nzIndeterminate]="indeterminate">
+            全选
+          </label>
+          <br />
+          <nz-checkbox-group [(ngModel)]="checkOptionsplats" (ngModelChange)="updatePlatsChecked()"></nz-checkbox-group>
+        </div>
+      </section> -->
+
+    </div>
+  </nz-modal>
+
+  <!-- 设置菜单 -->
+  <nz-modal nzWidth='1000' [nzOkLoading]='menuData.buttonLoading' [(nzVisible)]="menuData.show" nzTitle="设置菜单"
+    (nzOnCancel)="cancelMenu()" (nzOnOk)="submitSetMenu()">
+    <div>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">选择直属:</span>
+        <nz-tree-select [nzDropdownStyle]="{ 'max-height': '600px' }" nzDefaultExpandAll='true' style=" width: 100%;"
+          class="tpl-input" [nzNodes]="menuData.menuTree" nzShowSearch nzCheckable nzPlaceHolder="请选择权限菜单"
+          [(ngModel)]="menuData.data.menu_ids" (ngModelChange)="onChangeMenu($event)">
+        </nz-tree-select>
+      </section>
+    </div>
+  </nz-modal>
+
+  <!-- 设置活动 -->
+  <nz-modal nzWidth='1000' [nzOkLoading]='activityLoading' [(nzVisible)]="isActivityState" nzTitle="设置活动"
+    (nzOnCancel)="offActivity()" (nzOnOk)="submitActivity()">
+    <div>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">选择活动:</span>
+        <nz-select style="width:350px;margin-left:30px;" nzPlaceHolder="请选择" [(ngModel)]="Activityselect"
+          *ngIf="ActivityList.length>0" (ngModelChange)="activityChange($event)" [nzMaxTagCount]="99" nzMode="multiple">
+          <nz-option *ngFor="let option of ActivityList" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+        </nz-select>
+      </section>
+    </div>
+  </nz-modal>
+  <!-- 设置商户模板 -->
+  <nz-modal nzWidth='1000' [nzOkLoading]='activityLoading' [(nzVisible)]="hide" nzTitle="设置商户模板"
+    (nzOnCancel)="closeMerchants()" (nzOnOk)="submitTemplate()">
+    <nz-select style="width:350px;margin-left:30px;" nzPlaceHolder="请选择" [(ngModel)]="seedTemplate"
+      *ngIf="receiveTemplate.length>0" (ngModelChange)="selectChange($event)">
+      <nz-option *ngFor="let option of receiveTemplate" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+    </nz-select>
+  </nz-modal>
+
+  <!-- 详情 -->
+  <nz-drawer nzTitle="详情" nzWidth="auto" [nzVisible]="detail.show" (nzOnClose)="detail.show = false">
+    <section class="tpl-lists">
+      <nz-descriptions>
+        <nz-descriptions-item nzTitle='商户ID'>{{detail.data['id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='商户名称'>{{detail.data['name']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='商户标识'>{{detail.data['sign']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='娱乐城'>{{detail.data['casino_username']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='备注'>{{detail.data['remark']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='商户key'>{{detail.data['api_key']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='添加人'>{{detail.data['admin_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='更新人'>{{detail.data['update_admin_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='创建时间'>{{detail.data['created_at']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='更新时间'>{{detail.data['updated_at']}}</nz-descriptions-item>
+      </nz-descriptions>
+    </section>
+  </nz-drawer>
+</nz-content>

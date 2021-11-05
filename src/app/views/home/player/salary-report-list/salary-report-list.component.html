@@ -1,0 +1,79 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>玩家管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>工资记录</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="header">
+        <i class="fa fa-table"></i>
+        工资记录
+      </section>
+      <section class="mian-search">
+        <section class="tpl-list flexa">
+          <span>商户:</span>&nbsp;&nbsp;
+          <nz-select  nzSize="small" class="tpl-input" [(ngModel)]="searchData.partner_sign" nzAllowClear nzPlaceHolder="商户">
+            <nz-option [nzValue]="" [nzLabel]="'全部'"></nz-option>
+            <nz-option  *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span>用户名:</span>&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData.username" class="tpl-input" />&nbsp;&nbsp;
+        </section>&nbsp;&nbsp;
+        <section class="tpl-list flexa">
+          <span>时间:</span>&nbsp;&nbsp;
+          <nz-range-picker nzSize="small" [(ngModel)]="searchData.start_day" (ngModelChange)="onChange($event)" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+        </section>&nbsp;&nbsp;
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>商户</th>
+            <th>用户名</th>
+            <th>日期</th>
+            <th>总投注</th>
+            <th>总工资</th>
+            <th>下级工资</th>
+            <th>个人工资</th>
+            <th>实际金额</th>
+            <th>发送时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr>
+              <td>{{data.id}}</td>
+              <td>{{data.partner_name}}</td>
+              <td>{{data.username}}</td>
+              <td>{{data.day}}</td>
+              <td>{{data.self_real_bets + data.team_real_bets}}</td>
+              <td>{{data.total_salary }}</td>
+              <td>{{data.child_salary}}</td>
+              <td>{{data.self_salary}}</td>
+              <td>{{data.real_salary}}</td>
+              <td>{{data.send_time}}</td>
+              <td>
+                <span *ngIf="data.status == '0'">初始化</span>
+                <span *ngIf="data.status == '1'" style="color: blue;">已统计</span>
+                <span *ngIf="data.status == '2'" style="color: green;">已发放</span>
+              </td>
+              <td>
+                <a *ngIf="data.status == '1'">人工发放</a>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+    </section>
+  </section>
+</nz-content>

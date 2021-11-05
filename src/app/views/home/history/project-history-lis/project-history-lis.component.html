@@ -1,0 +1,120 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+      <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+      <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+      <nz-breadcrumb-item>游戏管理</nz-breadcrumb-item>
+      <nz-breadcrumb-item>订单列表</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section  style="padding:12px; background: #fff; min-height: 360px;">
+      <section class="header">
+        <i class="fa fa-table"></i>
+        订单列表
+      </section>
+      <section class="main-content">
+        <section class="select-lottery">
+          <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData.user_id" class="select-lottery-input" />&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="用户昵称" [(ngModel)]="searchData.nickname" class="select-lottery-input" />&nbsp;&nbsp;
+          <input nz-input nzSize="small" placeholder="订单ID" [(ngModel)]="searchData.project_id" class="select-lottery-input" />&nbsp;&nbsp;
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" nzShowTime></nz-range-picker>&nbsp;
+          <button nz-button nzType="primary" class="select-search" (click)="getDataList()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+        </section>
+
+        <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+          <thead class="ant-table-thead">
+            <tr>
+              <th nzWidth="6%">ID</th>
+              <th nzWidth="6%">用户ID</th>
+              <th nzWidth="7%">专场</th>
+              <th nzWidth="6%">玩家</th>
+              <th nzWidth="5%">金额</th>
+              <th nzWidth="5%">类型</th>
+              <th nzWidth="5%">包数</th>
+              <th nzWidth="5%">中雷倍数</th>
+              <th nzWidth="5%">雷号码</th>
+              <th nzWidth="5%">免死金额</th>
+              <th nzWidth="6%">已抢金额</th>
+              <th nzWidth="6%">剩余金额</th>
+              <th nzWidth="4%">中雷数</th>
+              <th nzWidth="5%">过期返还</th>
+              <th nzWidth="5%">幸运奖金</th>
+              <th nzWidth="9%">发包时间</th>
+              <th nzWidth="5%">状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+            <tr *ngFor="let item of tableList">
+              <td>{{item.id}}</td>
+              <td>{{item.user_id}}</td>
+              <td>{{item.room_name}}</td>
+              <td>{{item.nickname}}</td>
+              <td>{{utils.computeMoney(item.amount, 100)}}</td>
+              <td>{{item.type}}</td>
+              <td>{{item.packet_count}}</td>
+              <td>{{item.landmine_times}}</td>
+              <td>{{item.landmine_number}}</td>
+              <td>{{item.stat_ms_amount}}</td>
+  
+              <td>{{item.stat_fetched_amount}}</td>
+              <td>{{item.left_amount}}</td>
+  
+              <td>
+                {{item.stat_landmine_count}}
+              </td>
+  
+              <td>{{item.stat_expire_back_amount}}</td>
+              <td>{{item.stat_lucky_amount}}</td>
+              <td>{{item.created_at}}</td>
+              <td>
+                <span *ngIf="item.status == 1" style="color: green;">已领完</span>
+                <span *ngIf="item.status == 2" style="color: red;">已过期</span>
+                <span *ngIf="item.status == 0" style="color: grey;">领取中</span>
+              </td>
+              <td>
+                  <a href="javascript:;" class="a-link" (click)="doDetail(item.id)">详情</a>
+            </tr>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1"  [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+          (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+      </section>
+    </section>
+    <nz-drawer
+      [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+      [nzMaskClosable]="false"
+      [nzWidth]="1000"
+      [nzVisible]="detail.show"
+      nzTitle="订单详情"
+      (nzOnClose)="back()"
+    >
+    <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.data">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="7%">ID</th>
+          <th nzWidth="8%">发包额</th>
+          <th nzWidth="12%">抢包上级</th>
+          <th nzWidth="12%">抢包用户</th>
+          <th nzWidth="7%">抢包额</th>
+          <th nzWidth="5%">中雷</th>
+          <th nzWidth="7%">中雷赔付</th>
+          <th nzWidth="7%">幸运奖励</th>
+          <th nzWidth="20%">抢包时间</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of detail.data">
+          <td>{{item.id}}</td>
+          <td>{{item.project_amount}}</td>
+          <td>{{item.parent_name}}</td>
+          <td>{{item.receive_name}}</td>
+          <td>{{item.val}}</td>
+          <td>{{item.is_landmine ? '是' : '否'}}</td>
+          <td>{{item.landmine_amount}}</td>
+          <td>{{item.lucky_amount}}</td>
+          <td>{{item.receive_time}}</td>
+        </tr>
+        </tbody>
+      </nz-table>
+    </nz-drawer>
+  </nz-content>

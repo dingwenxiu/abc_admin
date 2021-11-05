@@ -1,0 +1,454 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>游戏管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>游戏列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      游戏列表
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <button nz-button nzType="primary" nzSize="default" nzSize="small" (click)="doAddGame()"> <i nz-icon
+            type="plus-circle"></i>添加游戏</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="default" nzSize="small" (click)="doFlush()"><i nz-icon
+            type="sync"></i>刷新缓存</button>
+      </section>
+      <nz-tabset [(nzSelectedIndex)]="selectedIndex">
+        <nz-tab *ngFor="let tab of seriesList" [nzTitle]="tab.lable" (nzClick)="selectTab(tab.value)">
+          <nz-table nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+            <thead class="ant-table-thead">
+              <tr>
+                <th nzWidth="8%">名称</th>
+                <th nzWidth="5%">商户</th>
+                <th nzWidth="7%">标识</th>
+                <th nzWidth="5%">系列</th>
+                <th>图标</th>
+                <th nzWidth="3%">快彩</th>
+                <th nzWidth="3%">自开</th>
+                <th nzWidth="6%">模式</th>
+                <th nzWidth="4%">单价</th>
+                <th nzWidth="4%">追号</th>
+                <th nzWidth="5%">每日奖期</th>
+                <th nzWidth="5%">最小奖金组</th>
+                <th nzWidth="5%">最大奖金组</th>
+                <th nzWidth="5%">调整奖金组</th>
+                <th nzWidth="6%">每期限额</th>
+                <th nzWidth="4%">状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+              <tr *ngFor="let item of tableData.data">
+                <td>{{item.cn_name}}</td>
+                <td style="color: green;">{{item.partner_name}}</td>
+                <td>{{item.en_name}}</td>
+                <td>{{item.series_id}}</td>
+                <td>
+                  <img *ngIf="item.img" src="{{item.img}}" style="width: 55px; height: 55px; padding: 3px;" />
+                </td>
+                <td>
+                  <ng-container *ngIf="item.is_fast; else elseTemplate">
+                    <i class="fa fa-check" style="color: green;"></i>
+                  </ng-container>
+                  <ng-template #elseTemplate>
+                    <i class="fa fa-times" style="color: red;"></i>
+                  </ng-template>
+                </td>
+                <td>
+                  <ng-container *ngIf="item.auto_open; else elseTemplate">
+                    <i class="fa fa-check" style="color: green;"></i>
+                  </ng-container>
+                  <ng-template #elseTemplate>
+                    <i class="fa fa-times" style="color: red;"></i>
+                  </ng-template>
+                </td>
+                <td>{{item.valid_modes}}</td>
+                <td>{{item.valid_price}}</td>
+                <td>{{item.max_trace_number}}</td>
+                <td>{{item.day_issue}}</td>
+                <td>{{item.min_prize_group}}</td>
+                <td>{{item.max_prize_group}}</td>
+                <td>{{item.diff_prize_group}}</td>
+                <td>{{item.max_prize_per_issue}}</td>
+                <td>
+                  <ng-container *ngIf="item.status; else elseTemplate">
+                    <i class="fa fa-check" style="color: green;"></i>
+                  </ng-container>
+                  <ng-template #elseTemplate>
+                    <i class="fa fa-times" style="color: red;"></i>
+                  </ng-template>
+                </td>
+                <td>
+                  <a href="javascript:;" class="a-link" (click)="eidtGame(item)">编辑</a>&nbsp;&nbsp;
+                  <a href="javascript:;" class="a-link" (click)="doAssign(item)">分配</a>&nbsp;&nbsp;
+                  <!-- <button nzSize="small" nz-button nzType="primary" (click)="eidtGame(item)">编辑</button>&nbsp; -->
+                  <!-- <button nzSize="small" nz-button nzType="primary" (click)="doAssign(item)">分配</button>&nbsp; -->
+
+                  <nz-switch [(ngModel)]="item.status" (click)="doLotteryStatus(item)" nzCheckedChildren="启用"
+                    nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+          <nz-pagination [(nzPageIndex)]="cur_page" [nzPageSize]='page_size' [nzTotal]="total_num"
+            (nzPageIndexChange)="pageChange($event)" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </nz-tab>
+      </nz-tabset>
+    </section>
+  </section>
+
+  <!-- 编辑 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="edit.show" nzTitle="编辑" (nzOnClose)="edit.show = false">
+    <nz-layout>
+      <section class="tpl-lists">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">中文名:</span> <input nz-input [(ngModel)]="edit.data['cn_name']" placeholder="请输入"
+            class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">英文名:</span> <input nz-input [(ngModel)]="edit.data['lottery_sign']" placeholder="请输入"
+            class="tpl-input" disabled={{isBan}} />
+        </section>
+        <section class="tpl-list flexa" *ngIf="!edit.data.icon_path">
+          <span class="tpl-title">icon:</span>
+          <nz-upload [nzAction]="api.domain + '/admin-api/lottery/lotteryUploadImg'" (nzChange)='upImages($event)'>
+            <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+          </nz-upload>
+        </section>
+        <section class="tpl-list flexa" *ngIf="edit.data.icon_path">
+          <span class="tpl-title">icon:</span>
+          <section class="img-box">
+            <img style="max-height: 100px;max-width: 100px;" [src]='edit.data.icon_path'>
+            <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg()"></i>
+          </section>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">最小奖金组:</span> <input nz-input [(ngModel)]="edit.data['min_prize_group']"
+            placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">最大奖金组:</span> <input nz-input [(ngModel)]="edit.data['max_prize_group']"
+            placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">奖金组差值:</span> <input nz-input [(ngModel)]="edit.data['diff_prize_group']"
+            placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">每期最大奖金:</span> <input nz-input [(ngModel)]="edit.data['max_prize_per_issue']"
+            placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">投注模式:</span>
+          <nz-tree-select id='valid_modes' type="valid_modes" style="width: 250px" [nzNodes]="validModesOption"
+            nzShowSearch nzCheckable [(ngModel)]="edit.data.valid_modes" [nzDefaultExpandAll]="true">
+          </nz-tree-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">一元/二元模式:</span>
+          <nz-tree-select id='valid_price' type="valid_price" style="width: 250px" [nzNodes]="validPriceOption"
+            nzShowSearch nzCheckable [(ngModel)]="edit.data.valid_price" [nzDefaultExpandAll]="true">
+          </nz-tree-select>
+        </section>
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" class="submit">
+        提交
+      </button>
+    </nz-layout>
+  </nz-drawer>
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="assignData.show" nzTitle="分配到商户"
+    (nzOnClose)="assignData.show = false">
+    <nz-layout>
+      <section class="tpl-lists">
+        <label nz-checkbox [(ngModel)]="allAssignChecked" (ngModelChange)="updateAllChecked()"
+          [nzIndeterminate]="indeterminate">
+          全选
+        </label>
+      </section>
+      <section class="tpl-lists">
+        <nz-checkbox-group [(ngModel)]="partnerAssignOption" (ngModelChange)="onAssignPartnerChecked($event)">
+        </nz-checkbox-group>
+      </section>
+      <button nz-button nzType="primary" (click)="submitAssign()" class="submit">
+        提交
+      </button>
+    </nz-layout>
+  </nz-drawer>
+  <!-- 添加游戏 -->
+  <nz-modal nzWidth='800' [(nzVisible)]="addGameOff" [nzFooter]="modalFooter" [nzTitle]="isAdd == '1'?'添加游戏':'修改游戏'"
+    (nzOnCancel)="closeGame()">
+    <nz-steps [nzCurrent]="curentPage" nzSize="small">
+      <nz-step nzTitle="彩种设置"></nz-step>
+      <nz-step nzTitle="奖期设置"></nz-step>
+      <nz-step nzTitle="奖金组设置"></nz-step>
+      <nz-step nzTitle="投注模式设置"></nz-step>
+    </nz-steps>
+    <nz-form-item>
+      <form style="margin-top: 20px;" nz-form>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">彩种</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select [(ngModel)]="addGame.series_id.value" name="series_id" id="series_id" nzSize="small"
+              style="width: 240px;" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of edit.series_options | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" name="cn_name" nzFor="sign">中文名</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="cn_name" id="sign"
+              [(ngModel)]="addGame.cn_name.value" placeholder="中文名" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">英文名</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input style="width: 240px;" nzSize="small" name="en_name" id="sign"
+              [(ngModel)]="addGame.en_name.value" placeholder="英文名" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" name="img" nzFor="sign">icon</nz-form-label>
+          <nz-form-control [nzSpan]="14" *ngIf="!addGame.lottery_icon.value">
+            <nz-upload [nzAction]="api.domain + '/admin-api/lottery/lotteryUploadImg'" (nzChange)='upImg($event)'>
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+            </nz-upload>
+          </nz-form-control>
+          <nz-form-control [nzSpan]="14" *ngIf="addGame.lottery_icon.value">
+            <img style='width: 40px;height: 40px;' [src]="api.imgUrl + '/' + addGame.lottery_icon.value" alt="">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">自开</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" name="is_fast" id="auto_open" nzSize="small" (ngModelChange)="isFast()"
+              [(ngModel)]="addGame.auto_open.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.auto_open | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">商户</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" [nzDisabled]="isPartner" nzSize="small" name="partner" id="partner"
+              [(ngModel)]="addGame.partner_sign.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.partner_sign | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">高频彩</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" name="is_fast" id="is_fast" nzSize="small"
+              [(ngModel)]="addGame.is_fast.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.is_fast | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==0'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">体育彩票</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" name="is_sport" id="is_sport" nzSize="small"
+              [(ngModel)]="addGame.is_sport.value" nzAllowClear>
+              <nz-option nzValue="1" nzLabel="是"></nz-option>
+              <nz-option nzValue="0" nzLabel="否"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" name="max_trace_number" nzFor="sign">追号</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" nzSize="small" name="max_trace_number" id="sign"
+              [(ngModel)]="addGame.max_trace_number.value" placeholder="追号" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" name="day_issue" nzFor="sign">每日奖期</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="day_issue" id="sign"
+              [(ngModel)]="addGame.day_issue.value" placeholder="每日奖期" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">奖期格式</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select nzSize="small" style="width: 240px;" name="issue_format" id="issue_format"
+              [(ngModel)]="addGame.issue_format.value" nzAllowClear>
+              <nz-option *ngFor="let option of addGameItem.issue_format" [nzLabel]="option" [nzValue]="option">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">奖期部分</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="issue_part" id="issue_part"
+              [(ngModel)]="addGame.issue_part.value" placeholder="奖期部分" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">奖期类型</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" name="issue_type" nzSize="small" id="issue_type"
+              [(ngModel)]="addGame.issue_type.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.issue_type | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">合法号码</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" (ngModelChange)="codeLength($event)" nzSize="small" name="valid_code"
+              id="valid_code" [(ngModel)]="addGame.valid_code.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.valid_code | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" name="sign" nzFor="sign">合法号码长度</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="sign" id="sign"
+              [(ngModel)]="addGame.code_length.value" [disabled]="true" placeholder="合法号码长度" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">娱乐城</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" name="open_casino" nzSize="small" id="open_casino"
+              [(ngModel)]="addGame.open_casino.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.open_casino | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">位置</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select style="width: 240px;" nzSize="small" name="positions" id="positions"
+              [(ngModel)]="addGame.positions.value" nzAllowClear>
+              <nz-option [nzValue]="option.key" [nzLabel]="option.value"
+                *ngFor="let option of addGameItem.positions | keyvalue"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==1'>
+          <nz-form-label nzRequired [nzSpan]="9" nzFor="sign">开放时间</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-checkbox-wrapper style="flex:1" (nzOnChange)="opentTime(addGameItem.opentTime)">
+              <div nz-row>
+                <nz-checkbox-group nz-col name="open_time" [(ngModel)]="addGameItem.opentTime"></nz-checkbox-group>
+              </div>
+            </nz-checkbox-wrapper>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="min_prize_group" nzFor="sign">最小奖金组</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="min_prize_group" id="sign"
+              [(ngModel)]="addGame.min_prize_group.value" placeholder="最小奖金组" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="max_prize_group" nzFor="sign">最大奖金组</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="max_prize_group" id="sign"
+              [(ngModel)]="addGame.max_prize_group.value" placeholder="最大奖金组" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="diff_prize_group" nzFor="sign">奖金组差值</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="diff_prize_group" id="sign"
+              [(ngModel)]="addGame.diff_prize_group.value" placeholder="奖金组差值" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="min_times" nzFor="sign">最小倍数</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="min_times" id="sign"
+              [(ngModel)]="addGame.min_times.value" placeholder="最小倍数" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="max_times" nzFor="sign">最大倍数</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="max_times" id="sign"
+              [(ngModel)]="addGame.max_times.value" placeholder="最大倍数" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="max_prize_per_code" nzFor="sign">单注奖金</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="max_prize_per_code" id="sign"
+              [(ngModel)]="addGame.max_prize_per_code.value" placeholder="单注奖金" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==2'>
+          <nz-form-label nzRequired [nzSpan]="9" name="max_prize_per_issue" nzFor="sign">单期最大奖金</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input nz-input nzSize="small" style="width: 240px;" name="max_prize_per_issue" id="sign"
+              [(ngModel)]="addGame.max_prize_per_issue.value" placeholder="单期最大奖金" />
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==3'>
+          <nz-form-label nzRequired [nzSpan]="9" name="valid_modes" nzFor="sign">投注模式</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-tree-select id='valid_modes' nzSize="small" type="valid_modes" name="valid_modes" style="width: 250px"
+              [nzNodes]="validModesOption" nzShowSearch nzCheckable [(ngModel)]="addGame.valid_modes.value"
+              [nzDefaultExpandAll]="true">
+            </nz-tree-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==3'>
+          <nz-form-label nzRequired [nzSpan]="9" name="valid_price" nzFor="sign">一元/二元模式:</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-tree-select id='valid_price' nzSize="small" type="valid_price" name="valid_price" style="width: 250px"
+              [nzNodes]="validPriceOption" nzShowSearch nzCheckable [(ngModel)]="addGame.valid_price.value"
+              [nzDefaultExpandAll]="true">
+            </nz-tree-select>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==3'>
+          <nz-form-label nzRequired [nzSpan]="9" name="status" nzFor="sign">开启</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-switch [(ngModel)]="addGame.status.value" name="status" [nzControl]='true'
+              (click)="changeStatus(addGame.status.value)" nzCheckedChildren="开" nzUnCheckedChildren="关" class="switch">
+            </nz-switch>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item *ngIf='curentPage==3'>
+          <nz-form-label nzRequired [nzSpan]="9" name="issue_desc" nzFor="sign">描述</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <textarea rows="3" style="width:250px" nz-input placeholder="请输入" name="issue_desc"
+              [(ngModel)]="addGame.issue_desc.value"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+      <nz-form-control>
+        <ng-template #modalFooter>
+          <button nz-button nzType="default" (click)="addGameOff = false">取消</button>
+          <button nz-button nzType="primary" (click)="nextCurent('less')" [nzLoading]="addData.buttonLoading"
+            *ngIf="curentPage >0">上一步</button>
+          <button nz-button nzType="primary" (click)="nextCurent('add')" [nzLoading]="addData.buttonLoading"
+            *ngIf='curentPage < 3'>下一步</button>
+          <button nz-button nzType="primary" *ngIf='curentPage>=3' [nzLoading]="addData.buttonLoading"
+            (click)="subminIssue()">提交</button>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+  </nz-modal>
+</nz-content>

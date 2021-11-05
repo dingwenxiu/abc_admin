@@ -1,0 +1,126 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>管理员</nz-breadcrumb-item>
+    <nz-breadcrumb-item>访问日志</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      访问日志
+    </section>
+    <section class="main-content" style="margin-top:10px;">
+      <section class="mian-search">
+        <div>
+          <span>用户名:</span>&nbsp;&nbsp;
+          <nz-select nzSize="small" style="width: 150px;" nzPlaceHolder="请选择用户名" [(ngModel)]="searchData['adminUser']"
+            nzAllowClear class="tpl-input">
+            <nz-option *ngFor="let item of adminUser|keyvalue" [nzLabel]="item.value" [nzValue]="item.value"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+            type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+            type="sync"></i>重置</button>
+        </div>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="5%">行为</th>
+            <th nzWidth="10%">管理ID</th>
+            <th nzWidth="10%">管理员名称</th>
+            <th nzWidth="10%">代理</th>
+            <th nzWidth="10%">浏览器</th>
+            <th nzWidth="10%">国家</th>
+            <th nzWidth="10%">城市</th>
+            <th nzWidth="10%">日期</th>
+            <th nzWidth="10%">设备</th>
+            <th nzWidth="10%">域名</th>
+            <th nzWidth="10%">IP</th>
+            <th nzWidth="10%">参数</th>
+            <th nzWidth="10%">路由</th>
+            <th nzWidth="10%">代理IP</th>
+            <th nzWidth="10%">平台</th>
+            <th nzWidth="10%">创建时间</th>
+            <th nzWidth="10%">更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.action}}</td>
+            <td>{{item.admin_id}}</td>
+            <td>{{item.admin_username}}</td>
+            <td>
+              <span (click)="lockTd(item,'2')">{{item.agent}}</span>
+            </td>
+            <td>{{item.browser}}</td>
+            <td>{{item.country}}</td>
+            <td>{{item.city}}</td>
+            <td>{{item.day}}</td>
+            <td>{{item.device}}</td>
+            <td>{{item.domain}}</td>
+            <td>{{item.ip}}</td>
+            <td>
+              <span (click)="lockTd(item,'1')">{{item.params}}</span>
+            </td>
+            <td>{{item.route}}</td>
+            <td>{{item.proxy_ip}}</td>
+            <td>{{item.platform}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="showContent(item)">详情</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="1100" [nzVisible]="params.show" nzTitle="详情" (nzOnClose)="params.show = false">
+    <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="params.data | keyvalue">
+      <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="15%">订单号</th>
+          <th nzWidth="10%">状态</th>
+          <th nzWidth="15%">金额</th>
+          <th nzWidth="15%">时间</th>
+          <th nzWidth="15%">标示</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr>
+          <td>{{params.data.game_order_id}}</td>
+          <td>
+            <ng-container *ngIf="params.data.status; else elseTemplate">
+              <i class="fa fa-check" style="color: green;"></i>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <i class="fa fa-times" style="color: red;"></i>
+            </ng-template>
+          </td>
+          <td>{{params.data.money}}</td>
+          <td>{{utils.formatTime(params.data.time)}}</td>
+          <td>{{params.data.sign}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-drawer>
+  <nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+    (nzOnCancel)="contentPop.show = false">
+    <section class="fw content">
+      {{contentPop.data}}
+    </section>
+  </nz-modal>
+</nz-content>

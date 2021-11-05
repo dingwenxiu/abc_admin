@@ -1,0 +1,78 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>行为日志</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      行为日志
+    </section>
+    <section class="mian-search">
+      <div>
+        <span>商户:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="access.partner_sign" nzAllowClear nzPlaceHolder="商户">
+          <nz-option *ngFor="let item of partnerSign | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <span class="tpl-title tpl-title-search">管理员:</span>
+        <input nz-input nzSize="small" placeholder="管理员昵称" [(ngModel)]="access.partner_admin_user"
+          class="select-lottery-input" />&nbsp;&nbsp;
+      </div>
+      <div>
+        <span class="tpl-title tpl-title-search">跳转路由:</span>
+        <input nz-input nzSize="small" placeholder="跳转路由" [(ngModel)]="access.route"
+          class="select-lottery-input" />&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" (click)="search()" class="select-search"><i nz-icon
+            type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" (click)="reset()" class="select-reset"><i nz-icon
+            type="sync"></i>重置</button>
+      </div>
+    </section>
+
+    <section class="main-content">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="8%">ID</th>
+            <th nzWidth="8%">商户</th>
+            <th nzWidth="8%">商户标识</th>
+            <th nzWidth="8%">管理员</th>
+            <th nzWidth="8%">路由</th>
+            <th nzWidth="8%">IP</th>
+            <th nzWidth="10%">设备</th>
+            <th nzWidth="10%">浏览器</th>
+            <th nzWidth="10%">平台</th>
+            <th nzWidth="18%">agent</th>
+            <th nzWidth="10%">时间</th>
+            <!-- <th>操作</th> -->
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>{{item.partner_admin_username}}</td>
+            <td>{{item.route}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.device}}</td>
+            <td>{{item.browser}}</td>
+            <td>{{item.platform}}</td>
+            <td>{{item.agent}}</td>
+            <td>{{item.created_at}}</td>
+            <!-- <td>
+              <a href="javascript:;" class="a-link">详情</a>
+            </td> -->
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>

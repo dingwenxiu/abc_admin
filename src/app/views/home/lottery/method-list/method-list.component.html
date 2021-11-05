@@ -1,0 +1,190 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>游戏管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>玩法列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      玩法列表
+    </section>
+    <section class="main-content">
+      <section class="mian-search">
+        <div>
+          <span>游戏系列:</span>&nbsp;&nbsp;
+          <nz-cascader [nzOptions]="lotteryOptions" nzSize="small" [(ngModel)]="defaultSelect"
+            (ngModelChange)="doSelectLottery($event)" [nzLabelProperty]="'label'" style="width: 150px;height: 25px;"></nz-cascader>
+          &nbsp;&nbsp;
+        </div>
+        <div>
+          <span>玩法ID:</span>&nbsp;&nbsp;
+          <input nz-input placeholder="输入玩法ID" nzSize="small" [(ngModel)]="searchData.config_id"
+            class="tpl-input" />&nbsp;&nbsp;
+        </div>
+        <div>
+          <span>每页数量:</span> &nbsp;&nbsp;
+          <nz-select nzSize="small" nz-input nzPlaceHolder="每页显示数量" [(ngModel)]="searchData.page_size"
+            nzAllowClear class="tpl-input">
+            <nz-option nzLabel="每页8条" nzValue="8"></nz-option>
+            <nz-option nzLabel="每页16条" nzValue="16"></nz-option>
+            <nz-option nzLabel="每页20条" nzValue="20"></nz-option>
+            <nz-option nzLabel="每页24条" nzValue="24"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </div>
+        <div>
+          <span>玩法状态:</span> &nbsp;&nbsp;
+          <nz-select nzSize="small" nz-input nzPlaceHolder="选择玩法状态" [(ngModel)]="searchData.status"
+            nzAllowClear class="tpl-input">
+            <nz-option nzLabel="全部" nzValue="all"></nz-option>
+            <nz-option nzLabel="禁用" nzValue="0"></nz-option>
+            <nz-option nzLabel="开启" nzValue="1"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+            type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+            type="sync"></i>重置</button>
+        </div>
+      </section>
+      <nz-table  nzShowQuickJumper [nzPageSize]="api['pageSize']" [nzShowPagination]="false"
+        [nzHideOnSinglePage]="true" #tableData [nzData]="methodList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">彩种</th>
+            <th nzWidth="8%">玩法名</th>
+            <th nzWidth="6%">组名</th>
+            <th nzWidth="4%">组序</th>
+            <th nzWidth="6%">行名</th>
+            <th nzWidth="4%">行序</th>
+            <th nzWidth="6%">单挑类型</th>
+            <th nzWidth="5%">单挑注数</th>
+            <th nzWidth="6%">单挑奖金</th>
+            <th nzWidth="25%">单挑配置</th>
+            <th nzWidth="6%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableData.data">
+            <td>{{item['lottery_name']}}</td>
+            <td>{{item['method_name']}}</td>
+            <td>{{item['method_group_name']}}</td>
+            <td>{{item['group_sort']}}</td>
+            <td>{{item['method_row_name']}}</td>
+            <td>{{item['tab_sort']}}</td>
+            <td>{{item['challenge_type_desc']}}</td>
+            <td>{{item['challenge_min_count']}}</td>
+            <td>{{item['challenge_bonus']}}</td>
+            <td>
+              <span *ngIf="item['challenge_type'] == 3 || item['challenge_type'] == 7">
+                如果号码“{{item['challenge_config_code']}}”存在,则单挑
+              </span>
+
+              <span *ngIf="item['challenge_type'] == 4">
+                组三小于等于{{item['challenge_config_zu3']}}注, 或者组六小于等于{{item['challenge_config']['zu6']}}注, 则单挑
+              </span>
+
+              <span *ngIf="item['challenge_type'] == 6">
+                如果号码“{{item['challenge_config_code'] | json}}”中存在任意:{{item['challenge_config']['min']}}个,则单挑
+              </span>
+            </td>
+            <td>
+              <nz-switch [(ngModel)]="item.status" (click)="changeStatus(item)" nzCheckedChildren="启用"
+                nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="details(item.id)">详情</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="doSetChallenge(item.id)">设置</a>&nbsp;&nbsp;
+              <!-- <button nzSize="small" nz-button nzType="primary" (click)="details(item.id)">详情</button> -->
+              <!-- <button nzSize="small" nz-button nzType="primary" (click)="doSetChallenge(item.id)">设置</button> -->
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageSize]="searchData.page_size" [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+
+<nz-modal nzTitle="详情" [nzCancelText]="null" [nzOkText]="null" nzWidth="100rem" [nzVisible]="drawerPop"
+  (nzOnCancel)="drawerPop = false">
+  <section class="tpl-lists">
+    <nz-descriptions >
+      <nz-descriptions-item *ngFor="let item of drawerData | keyValueDel" [nzTitle]="item[0]">{{item[1]}}
+      </nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>
+
+
+<nz-modal nzTitle="玩法单挑设置" nzWidth="560" [nzOkText]="null" [nzCancelText]="null" [nzOkLoading]="challengeData.loading"
+  [nzVisible]="challengeData.show" (nzOnCancel)="challengeData.show = false">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">当前彩种:</span>
+    <span class="tpl-input">{{challengeData.item['lottery_name']}}</span>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">当前玩法:</span>
+    <span class="tpl-input">{{challengeData.item['method_name']}}</span>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">类型:</span>
+    <nz-select class="tpl-input" nzPlaceHolder="类型" [(ngModel)]="challengeData.data.challenge_type" nzAllowClear
+      (ngModelChange)="valueChange($event)">
+      <nz-option *ngFor="let item of challengeData.challengeTypeOption |  keyvalue" [nzLabel]="item.value"
+        [nzValue]="item.key"></nz-option>
+    </nz-select>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">中文名:</span> <input nz-input [(ngModel)]="challengeData.data.challenge_min_count"
+      placeholder="请输入" class="tpl-input" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">最小注数:</span>
+    <input type="number" nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_min_count">
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">最大奖金:</span>
+    <input type="number" nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_bonus"
+      placeholder="请输入最大奖金" />
+  </section>
+  <section class="tpl-list flexa"
+    *ngIf="challengeData.data.challenge_type == '1' || challengeData.data.challenge_type == '2' ">
+    <span class="tpl-title">配置:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config" placeholder="请输入配置" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '3' ">
+    <span class="tpl-title">配置-指定号码:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.code"
+      placeholder="请输入指定号码,逗号隔开" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '6' ">
+    <span class="tpl-title">配置-指定N个号码:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.code"
+      placeholder="请输入指定号码,逗号隔开" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '6'">
+    <span class="tpl-title">配置-超过M个:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.min"
+      placeholder="指定号码出超过M个就为单挑" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '4'">
+    <span class="tpl-title">配置-组三注数:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.zu3" placeholder="请输入组三注数" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '4'">
+    <span class="tpl-title">配置-组六注数:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.zu6" placeholder="请输入组六注数" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="challengeData.data.challenge_type == '7'">
+    <span class="tpl-title">配置-和模式号码:</span>
+    <input nz-input class="tpl-input" [(ngModel)]="challengeData.data.challenge_config.code" placeholder="请输入指定号码" />
+  </section>
+  <button nz-button nzType="primary" (click)="doSetChallengeSubmit()" [nzLoading]="challengeData.loading"
+    class="submit">
+    提交
+  </button>
+</nz-modal>

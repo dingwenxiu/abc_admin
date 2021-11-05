@@ -1,0 +1,122 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理组列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      商户管理组列表
+      <section class="fr fw">
+        <!-- <button nz-button nzType="primary" nzSize="small"
+          (click)="addpartner()">添加商户管理组</button>&nbsp;&nbsp;&nbsp;&nbsp; -->
+        <button (click)='getDataList()' nzSize="small" style='width:100px; margin: 0 10px 0 0;' nz-button nzBlock
+          [nzType]="'dashed'" class="ant-btn__block mb-sm">
+          <i nz-icon nzType="redo" nzTheme="outline"></i>
+          <span>刷新</span>
+        </button>
+      </section>
+    </section>
+    <section class="mian-search">
+      <div>
+        <span>商户:</span>&nbsp;&nbsp;
+        <nz-select style="width: 150px;" nzSize="small" [(ngModel)]="searchData.partner_sign" nzAllowClear
+          nzPlaceHolder="商户">
+          <nz-option *ngFor="let item of partnerOptions | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+            type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+            type="sync"></i>重置</button>
+      </div>
+
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="partnerList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>管理组ID</th>
+            <th>商户</th>
+            <th>所属商户</th>
+            <th>组名</th>
+            <th>备注</th>
+            <th>添加时间</th>
+            <th>添加人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of partnerList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary">{{item.name}}</button>&nbsp; -->
+              {{item.name}}
+            </td>
+            <td>{{item.remark}}</td>
+            <td>{{item.created_at}}</td>
+            <td>
+              <span *ngIf="item.add_admin_id">系统:{{item.add_admin_id}}</span>
+              <span *ngIf="!item.add_admin_id">商户:{{item.add_partner_admin_id}}</span>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="doEdit(item)">编辑</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="showAdminUser(item)">管理员</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="adminGroupAclDetail(item)">查看权限</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="modifyPermissions(item)">编辑权限</a>&nbsp;&nbsp;
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="doEdit(item)">编辑</button>&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="showAdminUser(item)">管理员</button>&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary"
+                (click)="adminGroupAclDetail(item)">查看权限</button>&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary"
+               (click)="modifyPermissions(item)">编辑权限</button>&nbsp; -->
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+  <!-- 添加商户管理组 -->
+  <nz-drawer [nzClosable]="addData.show" [nzVisible]="addData.show" [nzMaskClosable]='false' nzWidth='540px'
+    nzPlacement="right" [nzTitle]="addData.isAdd?'添加商户管理组':'编辑商户管理组'" (nzOnClose)="addData.show = false">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">名称:</span> <input nz-input [(ngModel)]="addData.data.name" placeholder="请输入创建的管理组名称"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户:</span>
+        <nz-select class="tpl-input" [(ngModel)]="addData.data.partner_sign" nzAllowClear nzPlaceHolder="商户">
+          <nz-option *ngFor="let item of partnerOptions| keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">备注:</span> <input nz-input [(ngModel)]="addData.data.remark" placeholder="备注"
+          class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitTask()" [nzLoading]="addData.buttonLoading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+
+  <!-- 修改权限 -->
+  <!-- 权限设置 -->
+  <nz-drawer [nzClosable]="lookPermissions.show" [nzVisible]="lookPermissions.show" [nzMaskClosable]='false'
+    nzWidth='auto' nzPlacement="right" [nzTitle]="look == '1'?'查看权限':'编辑权限'" (nzOnClose)="lookPermissions.show = false">
+    <section class="drawer-box">
+      <nz-tree #nzTreeComponent [nzData]="nodes" nzCheckable (nzCheckBoxChange)="nzCheck($event)">
+      </nz-tree>
+    </section>
+    <button nz-button nzType="primary" *ngIf="look != '1'" (click)="confrigmodifyPermissions()">确认</button>
+  </nz-drawer>
+</nz-content>

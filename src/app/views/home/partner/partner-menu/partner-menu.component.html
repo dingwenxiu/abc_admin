@@ -1,0 +1,118 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户菜单列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      商户菜单列表
+    </section>
+    <section class="mian-search">
+      <div>
+        <span>商户:</span>&nbsp;&nbsp;
+        <nz-select nzSize="default" nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign"
+          nzAllowClear nzPlaceHolder="商户">
+          <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <span class="tpl-title tpl-title-search">菜单类型:</span>
+        <nz-select nzSize="default" nzSize="small" style="width: 150px;" [(ngModel)]="searchData.menu_type" nzAllowClear
+          nzPlaceHolder="菜单类型">
+          <nz-option nzValue="all" nzLabel="全部类型"></nz-option>
+          <nz-option *ngFor="let item of menuTypeOptions | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="doSearch()"><i nz-icon
+          type="search"></i>搜索</button>&nbsp;&nbsp;
+      <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+          type="sync"></i>重置</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="add()"><i nz-icon
+            type="plus-circle"></i>添加</button>
+      </div>
+    </section>
+    <section class="main-content">
+      <section class="select-lottery" *ngIf="searchData.pid!='0'">
+        <a href="javascript:;" class="a-link" (click)="resetSearch()">根目录</a>
+        <ng-container *ngFor="let item of parentSet">
+          >> <a href="javascript:;" class="a-link" (click)="doNavToChild(item)">{{item.c_name}}</a>
+        </ng-container>
+      </section>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="6%">商户</th>
+            <th nzWidth="6%">商户标识</th>
+            <th nzWidth="10%">标题</th>
+            <th nzWidth="12%">Route</th>
+            <th nzWidth="15%">Path</th>
+            <th nzWidth="5%">菜单类型</th>
+            <th nzWidth="8%">添加人</th>
+            <th nzWidth="10%">添加时间</th>
+            <th nzWidth="4%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>{{item.menu_title}}</td>
+            <td>{{item.menu_route}}</td>
+            <td>{{item.menu_path}}</td>
+            <td>
+              <span *ngIf="item.type != 1" style="color: green;">菜单</span>
+              <span *ngIf="item.type == 1" style="color: green;">链接</span>
+            </td>
+            <td>
+              <span *ngIf="item.add_admin_id">系统:{{item.add_admin_id}}</span>
+              <span *ngIf="!item.add_admin_id">商户:{{item.add_partner_admin_id}}</span>
+            </td>
+            <td>{{item.created_at}}</td>
+            <td>
+              <span *ngIf="item.status == 1" style="color: green;">启用</span>
+              <span *ngIf="item.status != 1" style="color: red;">禁用</span>
+            </td>
+            <td>
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="doEdit(item)">编辑</button>&nbsp; -->
+              <a href="javascript:;" class="a-link" (click)="doDel(item)">删除</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="showChild(item)">下级</a>&nbsp;&nbsp;
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="doDel(item)">删除</button>&nbsp; -->
+              <!-- <button nz-button [nzSize]='"small"' nzType="primary" (click)="showChild(item)">下级</button>&nbsp; -->
+              <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="doStatus(item)" nzCheckedChildren="开"
+                nzUnCheckedChildren="关" class="switch"></nz-switch>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+  <nz-drawer [nzClosable]="true" nzWidth='aotu' [nzVisible]="hide" nzPlacement="right" nzTitle="添加"
+    (nzOnClose)="editclose()">
+    <section class="drawer-box">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户名:</span>&nbsp;&nbsp;&nbsp;{{searchData.partner_sign}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">菜单名称:</span>
+        <nz-select nzSize="default" style="width: 260px;" [(ngModel)]="ids" nzAllowClear nzPlaceHolder="菜单名称">
+          <nz-option *ngFor="let item of addList" nzValue="{{item.id}}" nzLabel="{{item.cn_name}}">
+          </nz-option>
+        </nz-select>
+      </section>
+      <button nz-button style="margin-left:180px;" nzType="primary" (click)="bindingSubmit()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

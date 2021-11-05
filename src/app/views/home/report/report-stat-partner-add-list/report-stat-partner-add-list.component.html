@@ -1,0 +1,147 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>报表</nz-breadcrumb-item>
+        <nz-breadcrumb-item>商户报表</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            商户报表
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <span>商户:</span>&nbsp;&nbsp;
+                    <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign" nzAllowClear
+                        nzPlaceHolder="商户">
+                        <nz-option *ngFor="let item of partnerOption | keyvalue" nzValue="{{item.key}}"
+                            nzLabel="{{item.value}}"></nz-option>
+                    </nz-select>&nbsp;&nbsp;
+                    <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+                        type="search"></i>搜索</button>&nbsp;&nbsp;
+                <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i
+                        nz-icon type="sync"></i>重置</button>
+                </div>
+            </section>
+            <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th nzWidth="3%">ID</th>
+                        <th nzWidth="5%">商户标识</th>
+                        <th nzWidth="5%">商户名</th>
+                        <th nzWidth="5%">新注册</th>
+                        <th nzWidth="5%">投注人数</th>
+                        <th nzWidth="8%">团队充值金额</th>
+                        <th nzWidth="5%">充值次数</th>
+                        <th nzWidth="5%">首冲</th>
+                        <th nzWidth="5%">复冲</th>
+                        <th nzWidth="5%">提现金额</th>
+                        <th nzWidth="5%">提现次数</th>
+                        <th nzWidth="5%">投注额</th>
+                        <th nzWidth="5%">和值返款</th>
+                        <th nzWidth="5%">投注返点</th>
+                        <th nzWidth="5%">派奖</th>
+                        <th nzWidth="5%">游戏盈亏</th>
+                        <th nzWidth="8%">日期</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.id}}</td>
+                        <td>{{partnerOption[item.partner_sign]}}</td>
+                        <td>{{item.partner_name}}</td>
+                        <td>{{item.first_register}}</td>
+                        <td>{{item.have_bet}}</td>
+                        <td>{{item.recharge_amount}}</td>
+                        <td>{{item.recharge_count}}</td>
+                        <td>{{item.first_recharge_count}}</td>
+                        <td>{{item.repeat_recharge_count}}</td>
+                        <td>{{item.withdraw_amount}}</td>
+                        <td>{{item.withdraw_count}}</td>
+                        <td>{{item.bets}}</td>
+                        <td>{{item.he_return}}</td>
+                        <td>{{item.commission_from_bet}}</td>
+                        <td>{{item.bonus}}</td>
+                        <td>{{item.profit}}</td>
+                        <td>{{item.day}}</td>
+                        <td>
+                            <a href="javascript:;" class="a-link" (click)="details()">详情</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+                [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+                class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+    <nz-modal [(nzVisible)]="visible" nzWidth='800px' nzTitle="详情" (nzOnCancel)="visible = false"
+        (nzOnOk)="visible = false">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+            <thead class="ant-table-thead">
+                <tr>
+                    <th nzWidth="5%">撤单</th>
+                    <th nzWidth="5%">代理返点</th>
+                    <th nzWidth="5%">积分</th>
+                    <th nzWidth="5%">下级转账</th>
+                    <th nzWidth="5%">上级转账</th>
+                    <th nzWidth="5%">日工资</th>
+                    <th nzWidth="5%">分红</th>
+                    <th nzWidth="5%">活动礼金</th>
+                    <th nzWidth="5%">理赔充值</th>
+                    <th nzWidth="5%">系统扣减</th>
+                </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+                <tr *ngFor="let item of tableList">
+                    <td>{{item.cancel}}</td>
+                    <td>{{item.commission_from_child}}</td>
+                    <td>{{item.score}}</td>
+                    <td>{{item.transfer_to_child}}</td>
+                    <td>{{item.transfer_from_parent}}</td>
+                    <td>{{item.salary}}</td>
+                    <td>{{item.dividend}}</td>
+                    <td>{{item.gift}}</td>
+                    <td>{{item.system_transfer_add}}</td>
+                    <td>{{item.system_transfer_reduce}}</td>
+                </tr>
+            </tbody>
+        </nz-table>
+    </nz-modal>
+    <!-- <nz-drawer [nzClosable]="true" nzWidth='60%' [nzVisible]="visible" nzPlacement="right" nzTitle="详情"
+        (nzOnClose)="visible = false;">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+            <thead class="ant-table-thead">
+                <tr>
+                    <th nzWidth="5%">撤单</th>
+                    <th nzWidth="5%">代理返点</th>
+                    <th nzWidth="5%">积分</th>
+                    <th nzWidth="5%">下级转账</th>
+                    <th nzWidth="5%">上级转账</th>
+                    <th nzWidth="5%">日工资</th>
+                    <th nzWidth="5%">分红</th>
+                    <th nzWidth="5%">活动礼金</th>
+                    <th nzWidth="5%">理赔充值</th>
+                    <th nzWidth="5%">系统扣减</th>
+                </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+                <tr *ngFor="let item of tableList">
+                    <td>{{item.cancel}}</td>
+                    <td>{{item.commission_from_child}}</td>
+                    <td>{{item.score}}</td>
+                    <td>{{item.transfer_to_child}}</td>
+                    <td>{{item.transfer_from_parent}}</td>
+                    <td>{{item.salary}}</td>
+                    <td>{{item.dividend}}</td>
+                    <td>{{item.gift}}</td>
+                    <td>{{item.system_transfer_add}}</td>
+                    <td>{{item.system_transfer_reduce}}</td>
+                </tr>
+            </tbody>
+        </nz-table>
+    </nz-drawer> -->
+</nz-content>

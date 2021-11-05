@@ -1,0 +1,113 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>菜单管理</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      菜单列表
+    </section>
+    <section class="mian-search">
+      <button nz-button nzType="primary" (click)="edit.show = true" nzSize="small"><i nz-icon
+          type="plus-circle"></i>添加菜单</button>&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="reset()" nzSize="small"><i nz-icon type="sync"></i>重置</button>
+    </section>
+    <section class="main-content">
+      <section class="select-lottery" *ngIf="searchData.pid!='0'">
+        <a href="javascript:;" class="a-link" (click)="resetSearch()">根目录</a>
+        <ng-container *ngFor="let item of parentSet">
+          >> <a href="javascript:;" class="a-link" (click)="doNavToChild(item)">{{item.title}}</a>
+        </ng-container>
+      </section>
+      <nz-breadcrumb nzSeparator=">" *ngIf="parent.id > 0">
+        <nz-breadcrumb-item>
+          <a href="javascript:void(0)" (click)="doNavToChild({})">根列表</a>
+        </nz-breadcrumb-item>
+        <nz-breadcrumb-item *ngFor="let item of related">
+          <a href="javascript:void(0)" (click)="doNavToChild(item)">{{item.title}}</a>
+        </nz-breadcrumb-item>
+      </nz-breadcrumb>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="7%">ID</th>
+            <th nzWidth="10%">名称</th>
+            <th nzWidth="7%">类型</th>
+            <th nzWidth="7%">路由</th>
+            <th nzWidth="10%">前端路径</th>
+            <th nzWidth="7%">排序</th>
+            <th nzWidth="20%">class</th>
+            <th nzWidth="7%">添加人</th>
+            <th nzWidth="7%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.title}}</td>
+            <td>{{item.type === 1 ? "链接" : "菜单"}}</td>
+            <td>{{item.route ? item.route : "---"}}</td>
+            <td>{{item.api_path ? item.api_path : "---"}}</td>
+            <td>{{item.sort}}</td>
+            <td>{{item.css_class}}</td>
+            <td>{{item.admin_username ? item.admin_username : "系统"}}</td>
+            <td>
+              <i *ngIf="item.status === 1" class="fa fa-check txt-color-green"></i>
+              <i *ngIf="item.status !== 1" class="fa fa-times txt-color-red"></i>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="doEdit(item)">编辑</a>
+              <a href="javascript:;" class="a-link" (click)="doNavToChild(item)">子菜单</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="540" [nzVisible]="edit.show" nzTitle="添加菜单" (nzOnClose)="back()">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">上级菜单:</span><input nz-input [(ngModel)]="edit.data.pid" [placeholder]="edit.data.pid"
+          class="tpl-input" />
+      </section>
+
+      <section class="tpl-list flexa">
+        <span class="tpl-title">菜单标题:</span><input nz-input [(ngModel)]="edit.data.title"
+          [placeholder]="edit.data.title" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">类型:</span>
+        <nz-radio-group class="tpl-input tl" [(ngModel)]="edit.data.type">
+          <label nz-radio nzValue="0">菜单</label>
+          <label nz-radio nzValue="1">链接</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">路由:</span><input nz-input [(ngModel)]="edit.data.route" [placeholder]="edit.data.route"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">前端路径:</span><input nz-input [(ngModel)]="edit.data.api_path"
+          [placeholder]="edit.data.api_path" class="tpl-input">
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">排序:</span><input nz-input [(ngModel)]="edit.data.sort" [placeholder]="edit.data.sort"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">菜单图表类:</span><input nz-input [(ngModel)]="edit.data.css_class"
+          [placeholder]="edit.data.css_class" class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" [nzLoading]="edit.editSubmitButton" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

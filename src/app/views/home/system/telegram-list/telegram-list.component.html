@@ -1,0 +1,103 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>系统管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>Telegram管理</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      Telegram管理
+    </section>
+    <section class="main-content">
+      <section class="select-lottery">
+        <section class="tpl-list flexa">
+          <span>商户:</span>&nbsp;&nbsp;
+          <nz-select style="width: 150px;" nzSize="small" nzPlaceHolder="选择商户" [(ngModel)]="searchData.partner_sign"
+            nzAllowClear class="tpl-input">
+            <nz-option *ngFor="let item of deviceTypeOption | keyvalue" nzLabel="{{item.value}}" nzValue="{{item.key}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" (click)="addChannel(0)" nzSize="small"><i nz-icon
+            type="plus-circle"></i>添加组</button>&nbsp;&nbsp;&nbsp;
+        </section>
+      </section>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="true" [nzPageSize]="10" #tableData
+        [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="6%">ID</th>
+            <th nzWidth="10%">商户</th>
+            <th nzWidth="13%">组名称</th>
+            <th nzWidth="13%">组标识</th>
+            <th nzWidth="13%">组ID</th>
+            <th nzWidth="6%">状态</th>
+            <th nzWidth="17%">创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableData.data">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>
+              <p class="text-content">
+                {{item.channel_group_name}}
+              </p>
+            </td>
+            <td>{{item.channel_sign}}</td>
+            <td>{{item.channel_id}}</td>
+            <td>
+              <ng-container *ngIf="item.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>
+              {{item.created_at}}
+            </td>
+            <td id="operating">
+              <a href="javascript:;" class="a-link" (click)="addChannel(item)">编辑</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="doGenId(item.id)">更新组ID</a>&nbsp;&nbsp;
+              <!-- <button nz-button nzSize="small" class="control-button" nzType="primary"
+                (click)="addChannel(item)">编辑</button>&nbsp;&nbsp; -->
+              <!-- <button nz-button nzSize="small" class="control-button" nzType="primary"
+                (click)="doGenId(item.id)">更新组ID</button>&nbsp;&nbsp; -->
+              <!-- <button nz-button nzSize="small" class="control-button" nzType="primary"
+                (click)="changeStatus(item.id)">变更状态</button>&nbsp;&nbsp; -->
+              <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="changeStatus(item)" nzCheckedChildren="开"
+                nzUnCheckedChildren="关" class="switch"></nz-switch>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </section>
+  </section>
+</nz-content>
+
+<!-- 添加渠道 -->
+<nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+  [nzMaskClosable]="false" [nzWidth]="460" [nzVisible]="addData.show" nzTitle="添加/编辑组"
+  (nzOnClose)="addData.show = false">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">组名称:</span> <input nz-input [(ngModel)]="addData.data.channel_group_name"
+        placeholder="请输入组名称" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">组标识:</span> <input nz-input [(ngModel)]="addData.data.channel_sign" placeholder="请输入组标识"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">
+        <button nz-button nzType="primary" (click)="addChannelSubmit()" class="submit" [nzLoading]="addData.buttonLoading">
+          提交
+        </button></span>
+    </section>
+  </section>
+</nz-drawer>

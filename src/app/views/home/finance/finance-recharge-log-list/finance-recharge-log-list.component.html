@@ -1,0 +1,169 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>充值管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>充值日志</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      充值日志
+    </section>
+    <section class="select-lottery serach-tpl">
+      <section class="tpl-list flexa">
+        <span>商户:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" nzPlaceHolder="请选择商户" [(ngModel)]="searchData['partner_sign']" nzAllowClear class="tpl-input">
+          <nz-option [nzLabel]="'全部'" [nzValue]=""></nz-option>
+          <nz-option *ngFor="let item of patnerOptions | objkeys" [nzLabel]="patnerOptions[item]" [nzValue]="item"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span>用户ID:</span>&nbsp;&nbsp;
+        <input nz-input placeholder="用户ID" nzSize="small" [(ngModel)]="searchData['user_id']" class="tpl-input"/>
+      </section>
+      <section class="tpl-list flexa">
+        <span>用户名:</span>&nbsp;&nbsp;
+        <input nz-input placeholder="用户名" nzSize="small" [(ngModel)]="searchData['username']" class="tpl-input"/>
+      </section>
+      <section class="tpl-list flexa">
+        <span>昵称:</span>&nbsp;&nbsp;
+        <input nz-input placeholder="昵称" nzSize="small" [(ngModel)]="searchData['nickname']" class="tpl-input"/>
+      </section>
+      <section class="tpl-list flexa tpl-list-time">
+        <span>时间:</span>&nbsp;&nbsp;
+        <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+      </section>
+    </section>
+    <section class="main-content">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>商户</th>
+            <th>IP</th>
+            <th>订单号</th>
+            <th>金额</th>
+            <th>用户ID</th>
+            <th>用户名</th>
+            <th>昵称</th>
+            <th>请求返回</th>
+            <th>请求时间</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.order_id}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.nickname}}</td>
+            <td>{{item.request_reason}}</td>
+            <td>{{item.request_time}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="logDetail(item)">详细</a>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <!-- 日志详情 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="1400" [nzVisible]="logDetailData.show" nzTitle="日志详情"
+    (nzOnClose)="logDetailData.show = false">
+    <section class="drawer-box">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetailData.details | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">发起人</th>
+            <th nzWidth="10%">发起金额</th>
+            <th nzWidth="10%">发起IP</th>
+            <th nzWidth="6%">发起状态</th>
+            <th nzWidth="10%">发起原因</th>
+            <th nzWidth="10%">发起时间</th>
+            <th nzWidth="10%">回调IP</th>
+            <th nzWidth="6%">回调状态</th>
+            <th nzWidth="10%">回调原因</th>
+            <th>回调时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{logDetailData.details.nickname}}</td>
+            <td>{{utils.computeMoney(logDetailData.details.amount, 10000)}}</td>
+            <td>{{logDetailData.details.ip}}</td>
+            <td>{{logDetailData.details.request_status}}</td>
+            <td>{{logDetailData.details.request_reason.message}}</td>
+            <td>{{utils.formatTime(logDetailData.details.request_time)}}</td>
+            <td>{{logDetailData.details.back_ip}}</td>
+            <td>{{logDetailData.details.back_status}}</td>
+            <td>{{logDetailData.details.back_reason}}</td>
+            <td>{{utils.formatTime(logDetailData.details.back_time)}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <p class="log-tilte">请求参数</p>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetailData.details | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">amount</th>
+            <th nzWidth="10%">callback_url</th>
+            <th nzWidth="10%">channel</th>
+            <th nzWidth="6%">client_ip</th>
+            <th nzWidth="10%">merchant_id</th>
+            <th nzWidth="10%">order_id</th>
+            <th nzWidth="10%">sign</th>
+            <th nzWidth="6%">source</th>
+            <th>time</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{logDetailData.details.request_params.amount}}</td>
+            <td>{{logDetailData.details.request_params.callback_url}}</td>
+            <td>{{logDetailData.details.request_params.channel}}</td>
+            <td>{{logDetailData.details.request_params.client_ip}}</td>
+            <td>{{logDetailData.details.request_params.merchant_id}}</td>
+            <td>{{logDetailData.details.request_params.order_id}}</td>
+            <td>{{logDetailData.details.request_params.sign}}</td>
+            <td>{{logDetailData.details.request_params.source}}</td>
+            <td>{{utils.formatTime(logDetailData.details.request_params.time)}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <p class="log-tilte">发起返回</p>
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetailData.details | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="15%">status</th>
+            <th nzWidth="15%">msg</th>
+            <th nzWidth="20%" *ngIf="logDetailData.details.request_back">data</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{logDetailData.details.request_back ? logDetailData.details.request_back.status : '---'}}</td>
+            <td>{{logDetailData.details.request_back ? logDetailData.details.request_back.msg : '---'}}</td>
+            <td *ngIf="logDetailData.details.request_back">{{logDetailData.details.request_back.data | json}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </section>
+  </nz-drawer>
+</nz-content>

@@ -1,0 +1,192 @@
+<nz-content style="margin:0 16px;">
+    <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+        <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+        <nz-breadcrumb-item>游戏管理</nz-breadcrumb-item>
+        <nz-breadcrumb-item>控水</nz-breadcrumb-item>
+    </nz-breadcrumb>
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+        <section class="header">
+            <i class="fa fa-table"></i>
+            控水
+        </section>
+        <section class="main-content">
+            <section class="mian-search">
+                <div>
+                    <span>游戏系列:</span>&nbsp;&nbsp;
+                    <!-- <nz-cascader [nzOptions]="lotteryOptions" nzSize="small" [(ngModel)]="lottery"
+                        (ngModelChange)="doSelectLottery($event)" [nzLabelProperty]="'label'"
+                        style="width: 150px;height: 25px;"></nz-cascader>
+                    &nbsp;&nbsp; -->
+                    <nz-select nzSize="small" nzPlaceHolder="选择系列" [(ngModel)]="this.searchData.lottery_sign"
+                        nzAllowClear class="tpl-input" (ngModelChange)='doChangeSeries($event)'>
+                        <nz-option *ngFor="let item of lotteryOption |  keyvalue" [nzLabel]="item.value.label"
+                            [nzValue]="item.value.value"></nz-option>
+                    </nz-select>&nbsp;&nbsp;
+                </div>
+                <div>
+                    <span>商户:</span>&nbsp;&nbsp;
+                    <nz-select nzSize="small" [(ngModel)]="searchData.partner_sign" nzAllowClear nzPlaceHolder="选择商户"
+                        class="tpl-input">
+                        <nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+                            *ngFor="let item of dateRange|keyvalue"></nz-option>
+                    </nz-select>&nbsp;&nbsp;
+                </div>
+                <div>
+                    <span>奖期:</span>&nbsp;&nbsp;
+                    <input nz-input nzSize="small" placeholder="奖期" [(ngModel)]="searchData.issue"
+                        class="tpl-input" />&nbsp;&nbsp;
+                </div>
+                <div>
+                    <span class="tpl-title">日期:</span>
+                    <nz-date-picker nzSize="small" nzFormat="yyyy-MM-dd"
+                        (ngModelChange)="onGenLhcIssueDateChange($event)" [ngModel]="day">
+                    </nz-date-picker>&nbsp;
+                </div>
+                <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-search"
+                    (click)="doSearch()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+                <button style="margin-top: 9px;" nz-button nzType="primary" nzSize="small" class="select-reset"
+                    (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+            </section>
+            <section class="main-content">
+                <nz-tabset [(nzSelectedIndex)]="tabIndex">
+                    <nz-tab [nzTitle]="_tab.label" *ngFor="let _tab of lotteryTabOption"
+                        (nzSelect)="doTabChange(_tab.value)">
+                    </nz-tab>
+                </nz-tabset>
+            </section>
+            <nz-table nzShowQuickJumper [nzPageSize]='api.pageSize' [nzShowPagination]="false" #basicTable
+                [nzData]="tableList">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th nzWidth="5%">彩票名</th>
+                        <th nzWidth="5%">商户名称</th>
+                        <th nzWidth="5%" *ngIf="isIssue">奖期</th>
+                        <th nzWidth="5%">日期</th>
+                        <th nzWidth="8%">总投注</th>
+                        <th nzWidth="8%">总撤单</th>
+                        <th nzWidth="8%">总返点</th>
+                        <th nzWidth="8%">实际总奖金</th>
+                        <th nzWidth="8%">当前亏损</th>
+                        <th nzWidth="8%">当前水率百分比</th>
+                        <th nzWidth="8%">设定水率百分比</th>
+                        <th nzWidth="8%">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody">
+                    <tr *ngFor="let item of tableList">
+                        <td>{{item.lottery_name}}</td>
+                        <td>{{item.partner_name}}</td>
+                        <td *ngIf="isIssue">{{item.issue}}</td>
+                        <td>{{item.day}}</td>
+                        <td>{{item.total_bet}}</td>
+                        <td>{{item.total_cancel}}</td>
+                        <td>{{item.total_commission}}</td>
+                        <td>{{item.total_real_bonus }}</td>
+                        <td>
+                            <span *ngIf="item.loss>0" style="color:green;">{{item.loss}}</span>
+                            <span *ngIf="item.loss<0" style="color:red;">{{item.loss}}</span>
+                        </td>
+                        <td>{{item.bet_rate|percentage}}</td>
+                        <td>{{item.rate|percentage}}</td>
+                        <td>
+                            <a href="javascript:;" (click)="doDetail(item)" class="a-link">详情</a>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let item of day_stat">
+                        <td style="color: green;">统计:</td>
+                        <td>{{item.partner_name}}</td>
+                        <td>{{item.issue}}</td>
+                        <td>{{item.day}}</td>
+                        <td>{{item.total_bet}}</td>
+                        <td>{{item.total_cancel}}</td>
+                        <td>{{item.total_bonus}}</td>
+                        <td>{{item.total_challenge_bonus}}</td>
+                        <td>{{item.total_real_bonus }}</td>
+                        <td>水率</td>
+                    </tr>
+                </tbody>
+            </nz-table>
+            <nz-pagination [nzPageSize]="searchData.page_size" [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+                (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </section>
+    </section>
+    <nz-modal nzWidth="70%" [(nzVisible)]="isDetails.show" nzTitle="详情" (nzOnCancel)="isDetails.show = false">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detailsList">
+            <thead class="ant-table-thead">
+                <tr>
+                    <th nzWidth="5%">id</th>
+                    <th nzWidth="5%">彩票名</th>
+                    <th nzWidth="5%">商户名称</th>
+                    <th nzWidth="5%">奖期</th>
+                    <th nzWidth="5%">日期</th>
+                    <th nzWidth="8%">总投注</th>
+                    <th nzWidth="8%">总撤单</th>
+                    <th nzWidth="8%">总返点</th>
+                    <th nzWidth="8%">实际总奖金</th>
+                    <th nzWidth="8%">当前亏损</th>
+                    <th nzWidth="8%">当前水率百分比</th>
+                    <th nzWidth="8%">设定水率百分比</th>
+                </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+                <tr *ngFor="let item of detailsList">
+                    <td>{{item.id}}</td>
+                    <td>{{item.lottery_name}}</td>
+                    <td>{{dateRange[item.partner_sign]}}</td>
+                    <td>{{item.issue}}</td>
+                    <td>{{item.day}}</td>
+                    <td>{{item.total_bet}}</td>
+                    <td>{{item.total_cancel}}</td>
+                    <td>{{item.total_commission}}</td>
+                    <td>{{item.total_real_bonus}}</td>
+                    <td>
+                        <span *ngIf="item.loss>0" style="color:green;">{{item.loss}}</span>
+                        <span *ngIf="item.loss<0" style="color:red;">{{item.loss}}</span>
+                    </td>
+                    <td>{{item.bet_rate|percentage}}</td>
+                    <td>{{item.rate|percentage}}</td>
+                </tr>
+            </tbody>
+        </nz-table>
+        <nz-pagination [nzPageSize]="isDetails.page_size" [nzTotal]="isDetails.total" [(nzPageIndex)]="isDetails.index"
+            (nzPageIndexChange)="pageSearch()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </nz-modal>
+    <!-- <nz-drawer nzWidth="50%" [nzClosable]="true" [nzMaskClosable]="false" [nzVisible]="isDetails.show"
+        nzPlacement="right" nzTitle="详情" (nzOnClose)="isDetails.show = false">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detailsList">
+            <thead class="ant-table-thead">
+                <tr>
+                    <th>id</th>
+                    <th>彩票名</th>
+                    <th>奖期</th>
+                    <th>控水率</th>
+                    <th>日期</th>
+                    <th>状态</th>
+                    <th>总投注</th>
+                    <th>总奖金</th>
+                    <th>总撤单</th>
+                    <th>单挑奖金总额</th>
+                    <th>实际总奖金</th>
+                </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+                <tr *ngFor="let item of detailsList">
+                    <td>{{item.id}}</td>
+                    <td>{{item.lottery_name}}</td>
+                    <td>{{item.issue}}</td>
+                    <td>{{item.rate}}</td>
+                    <td>{{item.day}}</td>
+                    <td>{{item.status }}</td>
+                    <td>{{item.total_bet}}</td>
+                    <td>{{item.total_bonus}}</td>
+                    <td>{{item.total_cancel}}</td>
+                    <td>{{item.total_challenge_bonus}}</td>
+                    <td>{{item.total_real_bonus}}</td>
+                </tr>
+            </tbody>
+        </nz-table>
+        <nz-pagination [nzPageSize]="isDetails.page_size" [nzTotal]="isDetails.total" [(nzPageIndex)]="isDetails.index"
+            (nzPageIndexChange)="detailspageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </nz-drawer> -->
+</nz-content>

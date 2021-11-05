@@ -1,0 +1,106 @@
+<nz-content style="margin:0 16px;">
+	<nz-breadcrumb style="margin:16px 0;">
+		<nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+		<nz-breadcrumb-item>首页</nz-breadcrumb-item>
+		<nz-breadcrumb-item>历史数据</nz-breadcrumb-item>
+		<nz-breadcrumb-item>玩家历史返点记录</nz-breadcrumb-item>
+	</nz-breadcrumb>
+	<section style="padding:12px; background: #fff; min-height: 360px;">
+		<section class="header">
+			<i class="fa fa-table"></i>
+			玩家历史返点记录
+		</section>
+		<section class="main-content">
+			<section class="mian-search">
+				<div>
+					<span>商户:</span>&nbsp;&nbsp;
+					<nz-select [(ngModel)]="searchData.partner_sign" nzAllowClear nzPlaceHolder="选择商户" class="tpl-input"
+						nzSize="small">
+						<nz-option nzValue="{{item.key}}" nzLabel="{{item.value}}"
+							*ngFor="let item of isDateRange|keyvalue">
+						</nz-option>
+					</nz-select>&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>游戏:</span>&nbsp;&nbsp;
+					<nz-cascader nzSize="small" [nzOptions]="lotteryOption" [(ngModel)]="defaultSelect"
+						(ngModelChange)="doSelectLottery($event)" class="tpl-input"></nz-cascader>&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>用户名:</span>&nbsp;&nbsp;
+					<input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']"
+						class="tpl-input" />&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>账变ID:</span>&nbsp;&nbsp;
+					<input nz-input nzSize="small" placeholder="账变ID" [(ngModel)]="searchData['account_change_id']"
+						class="tpl-input" />&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>注单编号:</span>&nbsp;&nbsp;
+					<input nz-input nzSize="small" placeholder="注单编号" [(ngModel)]="searchData['project_id']"
+						class="tpl-input" />&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>每页条数:</span>&nbsp;&nbsp;
+					<nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']" nzAllowClear
+						nzPlaceHolder="每页条数" class="tpl-input">
+						<nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+						<nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+						<nz-option [nzValue]="'30'" nzLabel="30条"></nz-option>
+					</nz-select>&nbsp;&nbsp;
+				</div>
+				<div>
+					<span>时间:</span>&nbsp;&nbsp;
+					<nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+						(nzOnCalendarChange)="onCelen($event)" (click)="timeHandle()" nzShowTime>
+					</nz-range-picker>&nbsp;&nbsp;
+				</div>
+				<div>
+					<button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i
+							nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+					<button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i
+							nz-icon type="sync"></i>重置</button>
+				</div>
+			</section>
+			<nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+				<thead class="ant-table-thead">
+					<tr>
+						<th>商户</th>
+						<th>注单编号</th>
+						<th>帐变ID</th>
+						<th>彩票</th>
+						<th>玩法</th>
+						<th>用户名</th>
+						<th>投注奖金组</th>
+						<th>子奖金组</th>
+						<th>自身奖金组</th>
+						<th>奖期</th>
+						<th>金额</th>
+						<th>处理时间</th>						
+					</tr>
+				</thead>
+				<tbody class="ant-table-tbody">
+					<tr *ngFor="let item of tableList">
+						<td>{{isDateRange[item.partner_sign]}}</td>
+						<td>{{item.project_id}}</td>
+						<td>{{item.account_change_id}}</td>
+						<td>{{item.lottery_name}}</td>
+						<td>{{item.method_name}}</td>
+						<td>{{item.username}}</td>
+						<td>{{item.bet_prize_group}}</td>
+						<td>{{item.child_prize_group}}</td>
+						<td>{{item.self_prize_group}}</td>							
+						<td>{{item.issue}}</td>
+						<td>{{item.amount}}</td>
+						<td>{{item.process_time}}</td>						
+					</tr>
+				</tbody>
+			</nz-table>
+			<nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+				[(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+				class="nz-pagination">
+			</nz-pagination>
+		</section>
+	</section>
+</nz-content>

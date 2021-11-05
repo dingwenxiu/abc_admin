@@ -1,0 +1,167 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/" class="cur"><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item>首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item>商户域名列表</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="header">
+      <i class="fa fa-table"></i>
+      商户域名列表
+    </section>
+    <section class="mian-search">
+      <div>
+        <span>商户:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.partner_sign" nzAllowClear
+          nzPlaceHolder="商户">
+          <nz-option *ngFor="let item of partnerSign | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <span>域名类型:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.env_type" nzAllowClear
+          nzPlaceHolder="域名类型">
+          <nz-option *ngFor="let item of envTypeList | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <span>API类型:</span>&nbsp;&nbsp;
+        <nz-select nzSize="small" style="width: 150px;" [(ngModel)]="searchData.type" nzAllowClear
+          nzPlaceHolder="api类型">
+          <nz-option *ngFor="let item of typeList | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>&nbsp;&nbsp;
+      </div>
+      <div>
+        <button nz-button nzType="primary" nzSize="small" nzSize="small" class="select-search" (click)="search()"><i
+            nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+        <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+            type="sync"></i>重置</button>
+      </div>
+    </section>
+    <section class="mian-search">
+      <button nz-button nzType="primary" nzSize="small" (click)="addDomain()"><i nz-icon
+          type="plus-circle"></i>添加域名</button>&nbsp;&nbsp;
+      <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="delDoAdmin()"><i nz-icon
+          type="delete"></i>删除</button>&nbsp;&nbsp;
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">
+              <label nz-checkbox [(ngModel)]="allChecked" (ngModelChange)="updateAllChecked()"></label>
+            </th>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="5%">商户</th>
+            <th nzWidth="5%">商户标识</th>
+            <th nzWidth="5%">域名类型</th>
+            <th nzWidth="6%">API类型</th>
+            <th nzWidth="15%">域名</th>
+            <th nzWidth="10%">备注</th>
+            <th nzWidth="10%">添加时间</th>
+            <th nzWidth="10%">更新时间</th>
+            <th nzWidth="10%">添加人</th>
+            <th nzWidth="8%">状态</th>
+            <th nzWidth="10%">操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList; let i = index">
+            <td>
+              <label nz-checkbox [(ngModel)]="item.checked" (ngModelChange)="updateSingleChecked()"></label>
+            </td>
+            <td>{{item.id}}</td>
+            <td>{{item.partner_name}}</td>
+            <td>{{item.partner_sign}}</td>
+            <td>{{item.env_type_desc}}</td>
+            <td>{{item.type_desc}}</td>
+            <td>{{item.domain}}</td>
+            <td>{{item.remark}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>{{item.add_partner_admin_id}}</td>
+            <td>
+              <span *ngIf="item.status == 1" style="color: green;">启用</span>
+              <span *ngIf="item.status != 1" style="color: red;">禁用</span>
+            </td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="doEdit(item)">编辑</a>
+              <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="doStatus(item)" nzCheckedChildren="开"
+                nzUnCheckedChildren="关" class="switch"></nz-switch>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="540" [nzVisible]="add.show" nzTitle="添加域名" (nzOnClose)="back()">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户名称:</span>
+        <nz-select class="tpl-title" [(ngModel)]="add.data.partner_sign" nzPlaceHolder="商户名称" class="tpl-input">
+          <nz-option *ngFor="let item of partner_opentions | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">域名名称:</span><input nz-input [(ngModel)]="add.data.name" [placeholder]="add.data.name"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">域名:</span><input nz-input [(ngModel)]="add.data.domain" [placeholder]="add.data.domain"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">域名类型:</span>
+        <nz-select class="tpl-title" [(ngModel)]="add.data.type" nzPlaceHolder="域名类型" class="tpl-input">
+          <nz-option *ngFor="let item of typeList | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+          </nz-option>
+        </nz-select>
+      </section>
+
+      <section class="tpl-list flexa">
+        <span class="tpl-title">类型:</span>
+        <nz-radio-group class="tpl-input tl" [(ngModel)]="add.data.env_type">
+          <label nz-radio nzValue="1">本地</label>
+          <label nz-radio nzValue="2">测试</label>
+          <label nz-radio nzValue="3">正式</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">备注:</span><input nz-input type="textarea" [(ngModel)]="add.data.remark"
+          [placeholder]="add.data.remark" class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+  <!-- 编辑域名 -->
+  <nz-modal [(nzVisible)]="isVisible" nzTitle="修改域名" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+    [nzOkLoading]="isOkLoading">
+    <section class="tpl-list flexa">
+      <span class="title">原域名:</span>&nbsp;&nbsp;&nbsp;{{domainName}}
+    </section>
+    <section class="tpl-list flexa">
+      <span class="title">域名修改:</span>&nbsp;&nbsp;<input nz-input [(ngModel)]="edit.test_domain_name"
+        placeholder="请输入域名" class="tpl-input" />
+    </section>
+  </nz-modal>
+  <!-- 编辑域名 -->
+  <nz-modal [(nzVisible)]="isDelete" nzTitle="删除" (nzOnCancel)="CloseDel()" (nzOnOk)="handleDelOk()">
+    <section class="tpl-list flexa">
+      <span class="title">删除描述:</span>&nbsp;&nbsp;<input nz-input [(ngModel)]="request_desc" placeholder="请输入删除描述"
+        class="tpl-input" />
+    </section>
+  </nz-modal>
+</nz-content>

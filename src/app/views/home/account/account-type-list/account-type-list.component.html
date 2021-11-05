@@ -1,0 +1,202 @@
+<nz-content style="margin:0 16px;">
+  <nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item><i class="fa fa-home"></i></nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/" class="cur">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>账户</nz-breadcrumb-item>
+    <nz-breadcrumb-item>帐变类型</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <!-- <button nz-button nzType="primary" (click)="addItem(0)" nzSize="small">添加类型</button>&nbsp;&nbsp;&nbsp; -->
+    <!-- <button nz-button nzType="primary" (click)="flushCache()" nzSize="small">刷新缓存</button> -->
+    <section class="header">
+      <i class="fa fa-table"></i>
+      帐变类型
+    </section>
+    <section class="main-content" style="margin-top: 10px;">
+      <nz-table  nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="6%">名称</th>
+          <th nzWidth="8%">标识</th>
+          <th nzWidth="6%">类型</th>
+          <th nzWidth="6%">金额</th>
+          <th nzWidth="5%">用户</th>
+          <th nzWidth="5%">彩种</th>
+          <th nzWidth="5%">玩法</th>
+          <th nzWidth="5%">注单</th>
+          <th nzWidth="5%">奖期</th>
+          <th nzWidth="5%">来源</th>
+          <th nzWidth="5%">来源(管理)</th>
+          <th nzWidth="5%">冻结类型</th>
+          <th nzWidth="5%">活动</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of tableList">
+          <td>{{item.name}}</td>
+          <td>{{item.sign}}</td>
+          <td>
+              <ng-container *ngIf="item.type === 1; else type">
+                  <span class="cred">增加</span>
+                </ng-container>
+                <ng-template #type>
+                    <span class="cgreen">减少</span>
+                </ng-template>
+          </td>
+          <td>
+              <ng-container *ngIf="item.amount === 1; else amount">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #amount>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+          <td>
+              <ng-container *ngIf="item.user_id === 1; else user_id">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #user_id>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+
+          <td>
+              <ng-container *ngIf="item.lottery_sign === 1; else lottery_sign">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #lottery_sign>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+          <td>
+              <ng-container *ngIf="item.method_sign === 1; else method_sign">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #method_sign>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+          <td>
+            <ng-container *ngIf="item.project_id === 1; else project_id">
+              <i class="fa fa-check txt-color-green"></i>
+            </ng-container>
+            <ng-template #project_id>
+              <i class="fa fa-times txt-color-red"></i>
+            </ng-template>
+          </td>
+          <td>
+              <ng-container *ngIf="item.issue === 1; else issue">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #issue>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+          <td>
+            <ng-container *ngIf="item.from_id === 1; else from_id">
+              <i class="fa fa-check txt-color-green"></i>
+            </ng-container>
+            <ng-template #from_id>
+              <i class="fa fa-times txt-color-red"></i>
+            </ng-template>
+          </td>
+          <td>
+              <ng-container *ngIf="item.from_admin_id === 1; else from_admin_id">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #from_admin_id>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+          <td>
+              <span *ngIf="item.froze_type === 0">未冻结</span>
+              <span *ngIf="item.froze_type === 1">帐户到冻结</span>
+              <span *ngIf="item.froze_type === 2">从冻结返还</span>
+              <span *ngIf="item.froze_type === 3">冻结到玩家</span>
+              <span *ngIf="item.froze_type === 4">冻结到系统</span>
+          </td>
+          <td>
+              <ng-container *ngIf="item.activity_sign === 1; else activity_sign">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #activity_sign>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+          </td>
+        </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange($event)" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <nz-drawer nzTitle="详情" nzWidth="auto" [nzVisible]="detail.show" (nzOnClose)="detail.show = false">
+    <section class="tpl-lists">
+      <nz-descriptions >
+        <nz-descriptions-item nzTitle='ID'>{{detail.data['id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='标示'>{{detail.data['sign']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='名字'>{{detail.data['name']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='类型'>{{detail.data['type']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='金额'>{{detail.data['amount']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='用户ID'>{{detail.data['user_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='项目ID'>{{detail.data['project_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='管理ID'>{{detail.data['admin_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='创建时间'>{{detail.data['created_at']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle='更新时间'>{{detail.data['updated_at']}}</nz-descriptions-item>
+      </nz-descriptions>
+    </section>
+  </nz-drawer>
+
+  <!-- 添加 编辑 帐变类型 --->
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="addData.show"
+    [nzTitle]="addData.type === 0 ? '添加帐变类型' : '编辑'" 
+    (nzOnClose)="addData.show = false"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">帐变名称:</span> <input required nz-input [(ngModel)]="addData.data.name" placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">账变标识:</span> <input required nz-input [(ngModel)]="addData.data.sign" placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">账变类型::</span><nz-switch [(ngModel)]="addData.data.type" nzCheckedChildren="增加" nzUnCheckedChildren="减少"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户:</span><nz-switch [(ngModel)]="addData.data.user_id" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">金额:</span><nz-switch [(ngModel)]="addData.data.amount" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">房间ID:</span><nz-switch [(ngModel)]="addData.data.room_id" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">订单ID:</span><nz-switch [(ngModel)]="addData.data.project_id" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">来源:</span><nz-switch [(ngModel)]="addData.data.related_id" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">来源(管理):</span><nz-switch [(ngModel)]="addData.data.admin_id" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">冻结类型:</span>
+          <nz-select style="width: 173px;" [(ngModel)]="addData.data.froze_type" nzPlaceHolder="请选择" nzAllowClear>
+              <nz-option nzValue="0" nzLabel="未冻结"></nz-option>
+              <nz-option nzValue="1" nzLabel="帐户到冻结"></nz-option>
+              <nz-option nzValue="2" nzLabel="从冻结返还"></nz-option>
+              <nz-option nzValue="3" nzLabel="冻结到玩家"></nz-option>
+              <nz-option nzValue="4" nzLabel="冻结到系统"></nz-option>
+          </nz-select>
+      </section>
+      <button nz-button nzType="primary" (click)="submitAdd()" [nzLoading]="addData.submitStatus" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>
